@@ -2,6 +2,8 @@
 
 A powerful Google Sheets add-on that integrates multiple AI models (Google Gemini, OpenAI, and Anthropic) directly into your spreadsheets.
 
+![image](https://github.com/user-attachments/assets/cd190d93-83d0-40f6-9327-6d1f6101707b)
+
 ## Features
 
 - **Multiple AI Providers**: Support for Google Gemini, OpenAI, and Anthropic models

@@ -341,9 +341,11 @@
         </div>
       </div>
       <div class="button-row">
-        <button onclick="saveApiKey('gemini')">Save</button>
-        <button class="secondary" onclick="testApiKey('gemini')">Test</button>
+        <button onclick="saveAndTestApiKey('gemini')">Save</button>
         <button class="danger" onclick="removeApiKey('gemini')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('gemini'); return false;">Test saved key</a>
       </div>
     </div>
 
@@ -360,9 +362,11 @@
         </div>
       </div>
       <div class="button-row">
-        <button onclick="saveApiKey('openai')">Save</button>
-        <button class="secondary" onclick="testApiKey('openai')">Test</button>
+        <button onclick="saveAndTestApiKey('openai')">Save</button>
         <button class="danger" onclick="removeApiKey('openai')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('openai'); return false;">Test saved key</a>
       </div>
     </div>
 
@@ -379,9 +383,11 @@
         </div>
       </div>
       <div class="button-row">
-        <button onclick="saveApiKey('anthropic')">Save</button>
-        <button class="secondary" onclick="testApiKey('anthropic')">Test</button>
+        <button onclick="saveAndTestApiKey('anthropic')">Save</button>
         <button class="danger" onclick="removeApiKey('anthropic')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('anthropic'); return false;">Test saved key</a>
       </div>
     </div>
   </div>
@@ -531,27 +537,56 @@
         .getApiKeyStatus();
     }
 
-    function saveApiKey(provider) {
+    function saveAndTestApiKey(provider) {
       const apiKey = document.getElementById(provider + '-api-key').value.trim();
       if (!apiKey) {
         showNotification('Please enter an API key', 'error');
         return;
       }
 
+      showNotification('Testing API key...', 'success');
       google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            showNotification(result.message, 'success');
-            document.getElementById(provider + '-api-key').value = '';
-            updateApiKeyStatus();
+        .withSuccessHandler(function(testResult) {
+          if (testResult.success) {
+            // Only save if test passes
+            google.script.run
+              .withSuccessHandler(function(saveResult) {
+                if (saveResult.success) {
+                  showNotification('API key tested and saved successfully', 'success');
+                  document.getElementById(provider + '-api-key').value = '';
+                  updateApiKeyStatus();
+                } else {
+                  showNotification(saveResult.message, 'error');
+                }
+              })
+              .withFailureHandler(function(error) {
+                showNotification('Error saving API key: ' + error.message, 'error');
+              })
+              .setProviderApiKey(provider, apiKey);
           } else {
-            showNotification(result.message, 'error');
+            showNotification('API key test failed: ' + testResult.message, 'error');
           }
         })
         .withFailureHandler(function(error) {
-          showNotification('Error saving API key: ' + error.message, 'error');
+          showNotification('Error testing API key: ' + error.message, 'error');
         })
-        .setProviderApiKey(provider, apiKey);
+        .testApiKey(provider, apiKey);
+    }
+
+    function testSavedKey(provider) {
+      showNotification('Testing saved API key...', 'success');
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            showNotification('Saved API key is valid', 'success');
+          } else {
+            showNotification('Saved API key test failed: ' + result.message, 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error testing saved API key: ' + error.message, 'error');
+        })
+        .testApiKey(provider, null);
     }
 
     function testApiKey(provider) {

@@ -18,7 +18,7 @@ function onOpen() {
  * Shows documentation about the available custom functions
  */
 function showFunctionsDocumentation() {
-  var htmlOutput = HtmlService.createHtmlOutputFromFile('functionsDocumentation')
+  const htmlOutput = HtmlService.createHtmlOutputFromFile('functionsDocumentation')
     .setTitle('gpt4sheets Documentation')
     .setWidth(600)
     .setHeight(500);

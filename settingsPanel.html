@@ -312,6 +312,10 @@
     ::-webkit-scrollbar-thumb:hover {
       background: linear-gradient(135deg, #b8860b 0%, #d2691e 100%);
     }
+    .button-link-container {
+      margin-top: 4px;
+      text-align: right;
+    }
   </style>
 </head>
 
@@ -344,7 +348,7 @@
         <button onclick="saveAndTestApiKey('gemini')">Save</button>
         <button class="danger" onclick="removeApiKey('gemini')">Remove</button>
       </div>
-      <div style="margin-top:4px; text-align:right;">
+      <div class="button-link-container">
         <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('gemini'); return false;">Test saved key</a>
       </div>
     </div>

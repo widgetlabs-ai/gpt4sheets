@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f4f1eb 0%, #e8e2d5 100%);
+      color: #3d2914;
+      box-sizing: border-box;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #d2691e 0%, #b8860b 50%, #cd853f 100%);
+      color: #000;
+      padding: 18px;
+      font-size: 20px;
+      text-align: center;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(210, 105, 30, 0.3);
+      letter-spacing: 0.5px;
+    }
+
+    .tabs {
+      display: flex;
+      background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+      color: white;
+      box-shadow: 0 2px 4px rgba(139, 69, 19, 0.2);
+    }
+
+    .tab {
+      padding: 14px 24px;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      border-right: 1px solid #a0522d;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .tab:last-child {
+      border-right: none;
+    }
+
+    .tab:hover {
+      background: linear-gradient(135deg, #a0522d 0%, #cd853f 100%);
+      transform: translateY(-1px);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #d2691e 0%, #ff8c00 100%);
+      color: white;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #fff;
+    }
+
+    .content {
+      padding: 24px;
+      display: none;
+    }
+
+    .content.active {
+      display: block;
+    }
+
+    .section {
+      margin-bottom: 28px;
+      padding: 20px;
+      background: linear-gradient(135deg, #fff 0%, #faf8f3 100%);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+      border: 1px solid #e6d7c3;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 69, 19, 0.15);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #8b4513;
+      border-bottom: 2px solid #d2691e;
+      padding-bottom: 8px;
+    }
+
+    .section-description {
+      font-size: 13px;
+      color: #6b4423;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .section-description a {
+      color: #d2691e;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .section-description a:hover {
+      color: #ff8c00;
+      text-decoration: underline;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #5d3317;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e6d7c3;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      background: #fff;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #d2691e;
+      box-shadow: 0 0 0 3px rgba(210, 105, 30, 0.1);
+      background: #fefcf8;
+    }
+
+    button {
+      background: linear-gradient(135deg, #d2691e 0%, #ff8c00 100%);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin-right: 12px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(210, 105, 30, 0.3);
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(210, 105, 30, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: linear-gradient(135deg, #8b7355 0%, #a0522d 100%);
+    }
+
+    button.secondary:hover {
+      background: linear-gradient(135deg, #a0522d 0%, #cd853f 100%);
+    }
+
+    button.danger {
+      background: linear-gradient(135deg, #c44536 0%, #dc143c 100%);
+    }
+
+    button.danger:hover {
+      background: linear-gradient(135deg, #dc143c 0%, #ff6347 100%);
+    }
+
+    .notification {
+      padding: 14px 18px;
+      margin: 12px 0;
+      border-radius: 8px;
+      display: none;
+      font-weight: 500;
+      border-left: 4px solid;
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #e8f5e8 0%, #d4f4d4 100%);
+      color: #2d5016;
+      border-left-color: #4caf50;
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #ffeaea 0%, #ffcccb 100%);
+      color: #721c24;
+      border-left-color: #dc143c;
+    }
+
+    .api-key-status {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #f8f5f0;
+      border-radius: 6px;
+      border: 1px solid #e6d7c3;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 10px;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+    }
+
+    .status-configured {
+      background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+    }
+
+    .status-not-configured {
+      background: linear-gradient(135deg, #f44336 0%, #ff5722 100%);
+    }
+
+    .help-content {
+      line-height: 1.7;
+      color: #3d2914;
+    }
+
+    .help-content h3 {
+      color: #8b4513;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      border-bottom: 2px solid #d2691e;
+      padding-bottom: 6px;
+    }
+
+    .help-content h4 {
+      color: #a0522d;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .help-content code {
+      background: linear-gradient(135deg, #f8f5f0 0%, #f0ebe1 100%);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      color: #8b4513;
+      border: 1px solid #e6d7c3;
+      font-size: 13px;
+    }
+
+    .help-content ul {
+      padding-left: 24px;
+    }
+
+    .help-content li {
+      margin-bottom: 6px;
+    }
+
+    .help-content a {
+      color: #d2691e;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .help-content a:hover {
+      color: #ff8c00;
+      text-decoration: underline;
+    }
+
+    /* Scrollbar styling for webkit browsers */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f8f5f0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #d2691e 0%, #cd853f 100%);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #ff8c00 0%, #ffa500 100%);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">gpt4sheets Settings</div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-api-keys">API Keys</div>
+    <div class="tab" id="tab-preferences">Preferences</div>
+    <div class="tab" id="tab-help">Help</div>
+  </div>
+
+  <!-- API Keys Tab -->
+  <div class="content active" id="content-api-keys">
+    <div id="notification" class="notification"></div>
+    
+    <div class="section">
+      <div class="section-title">Google Gemini API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="gemini-api-key" placeholder="Enter your Gemini API key">
+        <div class="api-key-status" id="gemini-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <button onclick="saveApiKey('gemini')">Save Gemini Key</button>
+      <button class="secondary" onclick="testApiKey('gemini')">Test Key</button>
+      <button class="danger" onclick="removeApiKey('gemini')">Remove Key</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">OpenAI API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
+        <div class="api-key-status" id="openai-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <button onclick="saveApiKey('openai')">Save OpenAI Key</button>
+      <button class="secondary" onclick="testApiKey('openai')">Test Key</button>
+      <button class="danger" onclick="removeApiKey('openai')">Remove Key</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Anthropic API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="anthropic-api-key" placeholder="Enter your Anthropic API key">
+        <div class="api-key-status" id="anthropic-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <button onclick="saveApiKey('anthropic')">Save Anthropic Key</button>
+      <button class="secondary" onclick="testApiKey('anthropic')">Test Key</button>
+      <button class="danger" onclick="removeApiKey('anthropic')">Remove Key</button>
+    </div>
+  </div>
+
+  <!-- Preferences Tab -->
+  <div class="content" id="content-preferences">
+    <div id="preferences-notification" class="notification"></div>
+    
+    <div class="section">
+      <div class="section-title">Default Model</div>
+      <div class="section-description">
+        Choose the default AI model for AI_CALL() function
+      </div>
+      <div class="form-group">
+        <select id="default-model">
+          <!-- Options will be populated by JavaScript -->
+        </select>
+      </div>
+      <button onclick="saveDefaultModel()">Save Default Model</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Default Temperature</div>
+      <div class="section-description">
+        Set the default creativity level (0 = focused, 1 = creative)
+      </div>
+      <div class="form-group">
+        <input type="number" id="default-temperature" min="0" max="1" step="0.1" value="0">
+      </div>
+      <button onclick="saveDefaultTemperature()">Save Default Temperature</button>
+    </div>
+  </div>
+
+  <!-- Help Tab -->
+  <div class="content" id="content-help">
+    <div class="help-content">
+      <h3>Available Functions</h3>
+      
+      <h4>=AI_CALL(prompt, [inputText])</h4>
+      <p>Simple AI function that uses your default model and settings.</p>
+      <ul>
+        <li><strong>prompt</strong>: The question or instruction for the AI</li>
+        <li><strong>inputText</strong> (optional): Additional context or data</li>
+      </ul>
+      <p>Example: <code>=AI_CALL("Summarize this text:", A1)</code></p>
+
+      <h4>=AI_CALL_ADV(prompt, systemPrompt, inputText, temperature, modelName, outputType, overflow)</h4>
+      <p>Advanced AI function with full control over parameters.</p>
+      <ul>
+        <li><strong>prompt</strong>: The question or instruction</li>
+        <li><strong>systemPrompt</strong>: Context for the AI (e.g., "You are a helpful assistant")</li>
+        <li><strong>inputText</strong>: Additional input data</li>
+        <li><strong>temperature</strong>: Creativity level (0-1)</li>
+        <li><strong>modelName</strong>: Specific model to use</li>
+        <li><strong>outputType</strong>: "text", "list", or "matrix"</li>
+        <li><strong>overflow</strong>: Whether to expand into adjacent cells</li>
+      </ul>
+      <p>Example: <code>=AI_CALL_ADV("List 5 colors", "You are helpful", "", 0, "gemini-2.0-flash", "list", true)</code></p>
+
+      <h3>Getting API Keys</h3>
+      <ul>
+        <li><strong>Google Gemini</strong>: Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+        <li><strong>OpenAI</strong>: Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></li>
+        <li><strong>Anthropic</strong>: Visit <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a></li>
+      </ul>
+
+      <h3>Available Models</h3>
+      <ul>
+        <li><strong>Gemini</strong>: gemini-2.0-flash, gemini-2.5-pro-exp-03-25</li>
+        <li><strong>OpenAI</strong>: gpt-4o, gpt-4o-mini, o3-mini</li>
+        <li><strong>Anthropic</strong>: claude-3.7-sonnet, claude-3.5-sonnet, claude-haiku</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        this.classList.add('active');
+        
+        // Show corresponding content
+        const contentId = 'content-' + this.id.replace('tab-', '');
+        document.getElementById(contentId).classList.add('active');
+      });
+    });
+
+    // Load settings on page load
+    window.onload = function() {
+      loadSettings();
+    };
+
+    function loadSettings() {
+      google.script.run
+        .withSuccessHandler(function(settings) {
+          // Populate model dropdown
+          const modelSelect = document.getElementById('default-model');
+          modelSelect.innerHTML = '';
+          settings.availableModels.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            if (model === settings.defaultModel) {
+              option.selected = true;
+            }
+            modelSelect.appendChild(option);
+          });
+          
+          // Set temperature
+          document.getElementById('default-temperature').value = settings.defaultTemperature;
+          
+          // Update API key status
+          updateApiKeyStatus();
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error loading settings: ' + error.message, 'error');
+        })
+        .getUserSettings();
+    }
+
+    function updateApiKeyStatus() {
+      google.script.run
+        .withSuccessHandler(function(status) {
+          ['gemini', 'openai', 'anthropic'].forEach(provider => {
+            const statusElement = document.getElementById(provider + '-status');
+            const indicator = statusElement.querySelector('.status-indicator');
+            const text = statusElement.querySelector('span');
+            
+            if (status[provider] && status[provider].configured) {
+              indicator.className = 'status-indicator status-configured';
+              text.textContent = 'Configured (' + status[provider].keyPreview + ')';
+            } else {
+              indicator.className = 'status-indicator status-not-configured';
+              text.textContent = 'Not configured';
+            }
+          });
+        })
+        .getApiKeyStatus();
+    }
+
+    function saveApiKey(provider) {
+      const apiKey = document.getElementById(provider + '-api-key').value.trim();
+      if (!apiKey) {
+        showNotification('Please enter an API key', 'error');
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            showNotification(result.message, 'success');
+            document.getElementById(provider + '-api-key').value = '';
+            updateApiKeyStatus();
+          } else {
+            showNotification(result.message, 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error saving API key: ' + error.message, 'error');
+        })
+        .setProviderApiKey(provider, apiKey);
+    }
+
+    function testApiKey(provider) {
+      const apiKey = document.getElementById(provider + '-api-key').value.trim();
+      if (!apiKey) {
+        showNotification('Please enter an API key to test', 'error');
+        return;
+      }
+
+      showNotification('Testing API key...', 'success');
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            showNotification(result.message, 'success');
+          } else {
+            showNotification(result.message, 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error testing API key: ' + error.message, 'error');
+        })
+        .testApiKey(provider, apiKey);
+    }
+
+    function removeApiKey(provider) {
+      if (!confirm('Are you sure you want to remove the ' + provider + ' API key?')) {
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            showNotification(result.message, 'success');
+            updateApiKeyStatus();
+          } else {
+            showNotification(result.message, 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error removing API key: ' + error.message, 'error');
+        })
+        .removeProviderApiKey(provider);
+    }
+
+    function saveDefaultModel() {
+      const model = document.getElementById('default-model').value;
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            showNotification(result.message, 'success', 'preferences-notification');
+          } else {
+            showNotification(result.message, 'error', 'preferences-notification');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error saving default model: ' + error.message, 'error', 'preferences-notification');
+        })
+        .setDefaultModel(model);
+    }
+
+    function saveDefaultTemperature() {
+      const temperature = parseFloat(document.getElementById('default-temperature').value);
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            showNotification(result.message, 'success', 'preferences-notification');
+          } else {
+            showNotification(result.message, 'error', 'preferences-notification');
+          }
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error saving default temperature: ' + error.message, 'error', 'preferences-notification');
+        })
+        .setDefaultTemperature(temperature);
+    }
+
+    function showNotification(message, type, elementId = 'notification') {
+      const notification = document.getElementById(elementId);
+      notification.textContent = message;
+      notification.className = 'notification ' + type;
+      notification.style.display = 'block';
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 5000);
+    }
+  </script>
+  <div style="text-align:right; font-size:12px; color:#888; margin: 18px 18px 8px 0;">
+    Open source project by <a href="https://widgetlabs.ai" target="_blank" style="color:#b8860b; text-decoration:none;">Widgetlabs.ai</a>
+  </div>
+</body>
+</html> 

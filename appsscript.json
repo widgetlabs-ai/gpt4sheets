@@ -19,7 +19,7 @@
   },
   "sheets": {
     "macros": [{
-      "menuName": "WidgetLabs Sheets AddOn",
+      "menuName": "gpt4sheets",
       "functionName": "onOpen",
       "defaultShortcut": "Ctrl+Alt+Shift+A"
     }]

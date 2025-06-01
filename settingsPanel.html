@@ -578,6 +578,13 @@
     }
 
     function testSavedKey(provider) {
+      // Check if a saved key exists before testing
+      const statusElement = document.getElementById(provider + '-status');
+      const statusText = statusElement && statusElement.querySelector('span') ? statusElement.querySelector('span').textContent : '';
+      if (!statusText || statusText === 'Not configured') {
+        showNotification('No saved API key to test', 'error');
+        return;
+      }
       showNotification('Testing saved API key...', 'success');
       google.script.run
         .withSuccessHandler(function(result) {

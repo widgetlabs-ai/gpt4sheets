@@ -219,6 +219,7 @@ These permissions are required for the add-on to function.
 - 🐛 **Bug Reports**: [Open an issue](https://github.com/widgetlabs-ai/gpt4sheets/issues) on GitHub
 - 💬 **Questions**: Use [GitHub Discussions](https://github.com/widgetlabs-ai/gpt4sheets/discussions) for general help
 - 📖 **Documentation**: Check this README or our [Contributing Guide](CONTRIBUTING.md)
+- 🗺️ **Wiki**: Check out the project wiki for additional help topics, usage tips, etc
 
 ### Contributing to the Project
 We'd love your help! Here's how to get started:

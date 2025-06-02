@@ -1,6 +1,6 @@
-# WidgetLabs Sheets AddOn for Google Sheets
+# WidgetLabs Google Sheets appscript / add-on
 
-A powerful Google Sheets add-on that integrates multiple AI models (Google Gemini, OpenAI, and Anthropic) directly into your spreadsheets.
+A powerful Google Sheets script (add-on) that integrates multiple AI models (Google Gemini, OpenAI, and Anthropic) directly into your spreadsheets.
 
 <img width="1510" alt="image" src="https://github.com/user-attachments/assets/b78bcd63-c7e7-4f84-b905-99fbabba1245" />
 

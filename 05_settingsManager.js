@@ -3,62 +3,12 @@
  * @returns {Object} { quickSelect: string[], all: { provider: string, models: string[] }[] }
  */
 function getAllModelsGrouped() {
-  // Quick select: current flagship/default models
-  const quickSelect = getModelConfig().available;
-
-  // Full list (update as needed, or fetch from provider APIs in future)
+  const config = getModelConfig();
+  const quickSelect = config.available;
   const all = [
-    {
-      provider: 'Gemini',
-      models: [
-        'gemini-2.0-flash',
-        'gemini-2.5-pro-exp-03-25',
-        'gemini-1.5-pro',
-        'gemini-1.0-pro',
-        'gemini-1.0-pro-vision',
-        'gemini-1.0-ultra',
-        'gemini-pro',
-        'gemini-pro-vision',
-        'gemini-1.0-flash',
-        'gemini-1.0',
-        'gemini-1.0-lite'
-      ]
-    },
-    {
-      provider: 'OpenAI',
-      models: [
-        'gpt-4o',
-        'gpt-4o-mini',
-        'o3-mini',
-        'gpt-4-turbo',
-        'gpt-4',
-        'gpt-4-32k',
-        'gpt-3.5-turbo',
-        'gpt-3.5-turbo-16k',
-        'gpt-3.5-turbo-instruct',
-        'gpt-3.5-turbo-0125',
-        'gpt-3.5-turbo-1106',
-        'gpt-3.5-turbo-0613',
-        'gpt-3.5-turbo-0301'
-      ]
-    },
-    {
-      provider: 'Anthropic',
-      models: [
-        'claude-3.7-sonnet',
-        'claude-3.5-sonnet',
-        'claude-haiku',
-        'claude-3-opus',
-        'claude-3-sonnet',
-        'claude-3-haiku',
-        'claude-2.1',
-        'claude-2.0',
-        'claude-instant-1.2',
-        'claude-instant-1.1',
-        'claude-v1',
-        'claude-v1-100k'
-      ]
-    }
+    { provider: 'Gemini', models: config.all.gemini },
+    { provider: 'OpenAI', models: config.all.openai },
+    { provider: 'Anthropic', models: config.all.anthropic }
   ];
   return { quickSelect, all };
 }

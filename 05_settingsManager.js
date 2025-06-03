@@ -1,6 +1,12 @@
 /**
+ * @typedef {Object} ModelGroup
+ * @property {string[]} quickSelect - List of models for quick selection.
+ * @property {Array<{provider: string, models: string[]}>} all - List of all models grouped by provider.
+ */
+
+/**
  * Returns a grouped list of models for all providers: quick select and all models per provider
- * @returns {Object} { quickSelect: string[], all: { provider: string, models: string[] }[] }
+ * @returns {ModelGroup} The grouped list of models.
  */
 function getAllModelsGrouped() {
   const config = getModelConfig();

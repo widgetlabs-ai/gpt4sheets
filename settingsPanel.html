@@ -541,6 +541,9 @@
             })
             .withFailureHandler(function(error) {
               showNotification('Error loading model list: ' + error.message, 'error');
+              // Apply default temperature and update API key status on failure
+              document.getElementById('default-temperature').value = 0; // Default temperature
+              updateApiKeyStatus(); // Update API key status
             })
             .getAllModelsGrouped();
         })

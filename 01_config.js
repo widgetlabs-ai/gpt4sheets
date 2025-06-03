@@ -4,7 +4,7 @@
 
 // Model configurations
 const MODEL_CONFIG = {
-  default: "gpt-4o", // Most versatile, widely supported
+  default: "gemini-2.0-flash", // Most versatile, widely supported
   // Recommended/Quick Select: latest, best-in-class models for most use cases
   available: [
     // Google Gemini

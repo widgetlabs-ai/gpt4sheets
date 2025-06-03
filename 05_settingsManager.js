@@ -153,9 +153,19 @@ function removeProviderApiKey(provider) {
 function setDefaultModel(modelName) {
   try {
     const propertyStore = getPropertyStore();
-    const availableModels = getModelConfig().available;
-    
-    if (!availableModels.includes(modelName)) {
+    const config = getModelConfig();
+    // Flatten all models from all providers into a single array
+    const allModels = [
+      ...config.all.gemini,
+      ...config.all.openai,
+      ...config.all.anthropic
+    ];
+
+    // Debug logging
+    Logger.log('setDefaultModel called with: %s', modelName);
+    Logger.log('All models: %s', JSON.stringify(allModels));
+
+    if (!allModels.includes(modelName)) {
       return { success: false, message: `Invalid model: ${modelName}` };
     }
     

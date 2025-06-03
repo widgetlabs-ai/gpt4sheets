@@ -494,26 +494,58 @@
     };
 
     function loadSettings() {
+      // Use new backend function to get grouped models
       google.script.run
         .withSuccessHandler(function(settings) {
-          // Populate model dropdown
-          const modelSelect = document.getElementById('default-model');
-          modelSelect.innerHTML = '';
-          settings.availableModels.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            if (model === settings.defaultModel) {
-              option.selected = true;
-            }
-            modelSelect.appendChild(option);
-          });
-          
-          // Set temperature
-          document.getElementById('default-temperature').value = settings.defaultTemperature;
-          
-          // Update API key status
-          updateApiKeyStatus();
+          google.script.run
+            .withSuccessHandler(function(modelGroups) {
+              const modelSelect = document.getElementById('default-model');
+              modelSelect.innerHTML = '';
+
+              // Quick Select group
+              if (modelGroups.quickSelect && modelGroups.quickSelect.length > 0) {
+                const optGroupQuick = document.createElement('optgroup');
+                optGroupQuick.label = 'Quick Select (Recommended)';
+                modelGroups.quickSelect.forEach(model => {
+                  const option = document.createElement('option');
+                  option.value = model;
+                  option.textContent = model;
+                  if (model === settings.defaultModel) option.selected = true;
+                  optGroupQuick.appendChild(option);
+                });
+                modelSelect.appendChild(optGroupQuick);
+              }
+
+              // All Models by provider
+              if (modelGroups.all && Array.isArray(modelGroups.all)) {
+                modelGroups.all.forEach(group => {
+                  const optGroup = document.createElement('optgroup');
+                  optGroup.label = group.provider + ' (All)';
+                  group.models.forEach(model => {
+                    // Avoid duplicate in quick select
+                    if (modelGroups.quickSelect && modelGroups.quickSelect.includes(model)) return;
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    if (model === settings.defaultModel) option.selected = true;
+                    optGroup.appendChild(option);
+                  });
+                  if (optGroup.children.length > 0) modelSelect.appendChild(optGroup);
+                });
+              }
+
+              // Set temperature
+              document.getElementById('default-temperature').value = settings.defaultTemperature;
+              // Update API key status
+              updateApiKeyStatus();
+            })
+            .withFailureHandler(function(error) {
+              showNotification('Error loading model list: ' + error.message, 'error');
+              // Apply default temperature and update API key status on failure
+              document.getElementById('default-temperature').value = 0; // Default temperature
+              updateApiKeyStatus(); // Update API key status
+            })
+            .getAllModelsGrouped();
         })
         .withFailureHandler(function(error) {
           showNotification('Error loading settings: ' + error.message, 'error');

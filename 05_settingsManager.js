@@ -1,4 +1,24 @@
 /**
+ * @typedef {Object} ModelGroup
+ * @property {string[]} quickSelect - List of models for quick selection.
+ * @property {Array<{provider: string, models: string[]}>} all - List of all models grouped by provider.
+ */
+
+/**
+ * Returns a grouped list of models for all providers: quick select and all models per provider
+ * @returns {ModelGroup} The grouped list of models.
+ */
+function getAllModelsGrouped() {
+  const config = getModelConfig();
+  const quickSelect = config.available;
+  const all = [
+    { provider: 'Gemini', models: config.all.gemini },
+    { provider: 'OpenAI', models: config.all.openai },
+    { provider: 'Anthropic', models: config.all.anthropic }
+  ];
+  return { quickSelect, all };
+}
+/**
  * Settings management module for API keys and configuration 
  *
  * Provides functions to manage user settings, API keys, and preferences for the add-on.

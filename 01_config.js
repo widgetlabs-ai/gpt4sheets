@@ -13,6 +13,8 @@ const MODEL_CONFIG = {
     "gpt-4.1",
     // Anthropic Claude
     "claude-3-5-sonnet-latest",
+    // Perplexity
+    "sonar-medium-online",
   ],
   // Full, up-to-date list for all providers (text-only)
   all: {
@@ -52,6 +54,15 @@ const MODEL_CONFIG = {
       "claude-3-opus-latest",
       // Older 3.x and instant/v1 models omitted as deprecated
     ],
+    perplexity: [
+      "sonar-large-online",
+      "sonar-medium-online",
+      "sonar-small-online",
+      "sonar-large-chat",
+      "sonar-medium-chat",
+      "sonar-small-chat",
+      // As of June 2025
+    ],
   },
 };
 
@@ -69,7 +80,8 @@ const PROPERTY_STORE = {
 const API_ENDPOINTS = {
   gemini: 'https://generativelanguage.googleapis.com/v1beta/models',
   openai: 'https://api.openai.com/v1/chat/completions',
-  anthropic: 'https://api.anthropic.com/v1/messages'
+  anthropic: 'https://api.anthropic.com/v1/messages',
+  perplexity: 'https://api.perplexity.ai/chat/completions'
 };
 
 // Function to get model configuration

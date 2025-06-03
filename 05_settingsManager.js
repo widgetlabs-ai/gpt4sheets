@@ -14,7 +14,8 @@ function getAllModelsGrouped() {
   const all = [
     { provider: 'Gemini', models: config.all.gemini },
     { provider: 'OpenAI', models: config.all.openai },
-    { provider: 'Anthropic', models: config.all.anthropic }
+    { provider: 'Anthropic', models: config.all.anthropic },
+    { provider: 'Perplexity', models: config.all.perplexity }
   ];
   return { quickSelect, all };
 }
@@ -224,6 +225,8 @@ function testApiKey(provider, apiKey) {
       result = callOpenAIAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else if (provider === 'anthropic') {
       result = callAnthropicAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
+    } else if (provider === 'perplexity') {
+      result = callPerplexityAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else {
       return { success: false, message: `Unknown provider: ${provider}` };
     }
@@ -250,7 +253,7 @@ function getApiKeyStatus() {
     const apiKeys = getStoredApiKeys();
     const status = {};
     
-    ['gemini', 'openai', 'anthropic'].forEach(provider => {
+    ['gemini', 'openai', 'anthropic', 'perplexity'].forEach(provider => {
       status[provider] = {
         configured: !!(apiKeys[provider] && apiKeys[provider].trim() !== ''),
         keyPreview: apiKeys[provider] ? `${apiKeys[provider].substring(0, 8)}...` : 'Not set'
@@ -261,5 +264,26 @@ function getApiKeyStatus() {
   } catch (error) {
     console.error('Failed to get API key status:', error);
     return {};
+  }
+}
+
+/**
+ * Saves user preferences
+ * @param {Object} formObject The form data as an object
+ * @returns {Object} Result with success status and message
+ */
+function savePreferences(formObject) {
+  try {
+    // Save the include_search_results preference (true/false)
+    if (formObject.hasOwnProperty('include_search_results')) {
+      PropertiesService.getUserProperties().setProperty('include_search_results', 'true');
+    } else {
+      PropertiesService.getUserProperties().setProperty('include_search_results', 'false');
+    }
+    
+    return { success: true, message: 'Preferences saved successfully' };
+  } catch (error) {
+    console.error('Failed to save preferences:', error);
+    return { success: false, message: `Error saving preferences: ${error.message}` };
   }
 }

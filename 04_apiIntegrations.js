@@ -1,7 +1,7 @@
 /**
  * Direct API Integrations for AI model providers 
  * 
- * Provides functions to call Gemini, OpenAI, and Anthropic APIs directly.
+ * Provides functions to call Gemini, OpenAI, Anthropic, and Perplexity APIs directly.
  * All functions are designed for use in Google Apps Script and are referenced
  * throughout the project.
  *
@@ -303,5 +303,125 @@ function callAnthropicAPI(systemPrompt, prompt, inputText, temperature, modelNam
 
   } catch (error) {
     return handleError(error, 'Anthropic API');
+  }
+}
+
+/**
+ * Calls the Perplexity API directly.
+ *
+ * @param {string} systemPrompt - The system prompt to set context.
+ * @param {string} prompt - The user prompt.
+ * @param {string} inputText - Additional input text.
+ * @param {number} temperature - The temperature parameter (0-1).
+ * @param {string} modelName - The specific Perplexity model to use.
+ * @param {string} [outputType="text"] - The output type ("text", "list", "matrix").
+ * @returns {string|Array} The API response.
+ */
+function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelName, outputType = "text") {
+  try {
+    // Validate API key
+    const validation = validateApiKeyForModel(modelName);
+    if (!validation.success) {
+      return validation.message;
+    }
+
+    // Get API key
+    const provider = getProviderFromModel(modelName);
+    const apiKey = getApiKey(provider);
+
+    // Prepare messages
+    const messages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: prompt + (inputText ? "\n\n" + inputText : "") }
+    ];
+
+    // Add instruction for structured outputs
+    if (outputType === "list" || outputType === "matrix") {
+      const structureInstruction = outputType === "list" 
+        ? "Please respond with a JSON array of strings."
+        : "Please respond with a JSON array of arrays (matrix format).";
+      
+      messages[messages.length - 1].content += "\n\n" + structureInstruction;
+    }
+
+    const data = {
+      model: modelName,
+      messages: messages,
+      temperature: parseFloat(temperature || 0)
+    };
+
+    // Add search context configuration for online models
+    if (modelName.includes("-online")) {
+      data.context_config = {
+        time_frame: "any time",  // Default time frame
+        search_focus: "balanced" // Default search focus
+      };
+    }
+
+    // Make API request
+    const endpoint = 'https://api.perplexity.ai/chat/completions';
+    
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      payload: JSON.stringify(data)
+    };
+
+    const response = makeHttpRequest(endpoint, requestOptions);
+
+    if (!response.success) {
+      return `Error: ${response.error}`;
+    }
+
+    // Process response
+    const responseData = response.data;
+    
+    if (responseData.error) {
+      return `Error: ${responseData.error.message || JSON.stringify(responseData.error)}`;
+    }
+
+    if (!responseData.choices || responseData.choices.length === 0) {
+      return "Error: No response generated";
+    }
+
+    const choice = responseData.choices[0].message;
+    const content = choice.content;
+
+    // Check if we should include search results
+    const includeSearchResults = PropertiesService.getUserProperties().getProperty('include_search_results') === 'true';
+    const searchResults = choice.search_results || [];
+    
+    // For structured outputs like list and matrix
+    if (outputType === "list" || outputType === "matrix") {
+      try {
+        // For structured output, we can't append search results to the result
+        return JSON.parse(content);
+      } catch (parseError) {
+        return `Error parsing structured response: ${parseError.message}`;
+      }
+    }
+
+    // For text output with search results
+    let finalContent = content;
+    
+    // Append search results if enabled and available
+    if (includeSearchResults && searchResults.length > 0 && modelName.includes("-online")) {
+      finalContent += "\n\n===== SEARCH RESULTS =====\n\n";
+      
+      for (let i = 0; i < searchResults.length; i++) {
+        const result = searchResults[i];
+        finalContent += `[${i+1}] ${result.title || 'Untitled'}\n`;
+        finalContent += `${result.url || 'No URL'}\n`;
+        finalContent += `${result.snippet || 'No snippet available'}\n\n`;
+      }
+    }
+
+    return finalContent;
+
+  } catch (error) {
+    return handleError(error, 'Perplexity API');
   }
 }

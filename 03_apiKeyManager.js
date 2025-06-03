@@ -123,6 +123,8 @@ function getProviderFromModel(modelName) {
     return 'openai';
   } else if (modelName.startsWith('claude-')) {
     return 'anthropic';
+  } else if (modelName.startsWith('sonar-')) {
+    return 'perplexity';
   } else {
     throw new Error(`Unknown model provider for model: ${modelName}`);
   }

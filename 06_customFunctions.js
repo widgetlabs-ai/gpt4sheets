@@ -43,6 +43,8 @@ function AI_CALL(prompt, inputText = "") {
       return callOpenAIAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
     } else if (selectedModel.startsWith('claude-')) {
       return callAnthropicAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
+    } else if (selectedModel.startsWith('sonar-')) {
+      return callPerplexityAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
     } else {
       return "Error: Unsupported model: " + selectedModel;
     }
@@ -128,6 +130,8 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
       response = callOpenAIAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
     } else if (selectedModel.startsWith('claude-')) {
       response = callAnthropicAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
+    } else if (selectedModel.startsWith('sonar-')) {
+      response = callPerplexityAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
     } else {
       return "Error: Unsupported model: " + selectedModel;
     }

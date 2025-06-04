@@ -156,6 +156,13 @@ function removeProviderApiKey(provider) {
  * @returns {Object} Result with success status and message
  */
 function setDefaultModel(modelName) {
+    /**
+     * Determines if the environment is in debug mode.
+     * @returns {boolean} True if in debug mode, false otherwise.
+     */
+    function isDebugMode() {
+        return PropertiesService.getScriptProperties().getProperty('DEBUG_MODE') === 'true';
+    }
   try {
     const propertyStore = getPropertyStore();
     const config = getModelConfig();
@@ -169,7 +176,9 @@ function setDefaultModel(modelName) {
 
     // Debug logging
     Logger.log('setDefaultModel called with: %s', modelName);
-    Logger.log('All models: %s', JSON.stringify(allModels));
+    if (isDebugMode()) {
+        Logger.log('All models: %s', JSON.stringify(allModels));
+    }
 
     if (!allModels.includes(modelName)) {
       return { success: false, message: `Invalid model: ${modelName}` };

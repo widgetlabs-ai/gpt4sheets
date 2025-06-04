@@ -452,12 +452,11 @@
     <div class="section">
       <div class="section-title">Preferences</div>
       <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="include_search_results" name="include_search_results" 
-               <?= getUserProperty('include_search_results') === 'true' ? 'checked' : '' ?>>
+        <input class="form-check-input" type="checkbox" id="include_search_results" name="include_search_results">
         <label class="form-check-label" for="include_search_results">
           Include Perplexity search results in responses
         </label>
-        <div class="form-text">When using Perplexity online models, append search results to the response</div>
+        <div class="form-text">When using Perplexity models, append search results to the response</div>
       </div>
     </div>
   </div>
@@ -570,6 +569,8 @@
 
               // Set temperature
               document.getElementById('default-temperature').value = settings.defaultTemperature;
+              // Set include_search_results checkbox
+              document.getElementById('include_search_results').checked = settings.include_search_results === true;
               // Update API key status
               updateApiKeyStatus();
             })
@@ -753,6 +754,19 @@
         notification.style.display = 'none';
       }, 5000);
     }
+
+    // Add this inside your <script> tag, after loadSettings()
+    document.getElementById('include_search_results').addEventListener('change', function() {
+      const checked = this.checked;
+      google.script.run
+        .withSuccessHandler(function(result) {
+          showNotification(result.message, 'success', 'preferences-notification');
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error saving preferences: ' + error.message, 'error', 'preferences-notification');
+        })
+        .savePreferences(checked ? { include_search_results: true } : {});
+    });
   </script>
   <div style="text-align:right; font-size:11px; color:#b8860b; margin: 14px 10px 6px 0;">
     Open source project by <a href="https://widgetlabs.ai" target="_blank" style="color:#d2691e; text-decoration:none;">Widgetlabs.ai</a>

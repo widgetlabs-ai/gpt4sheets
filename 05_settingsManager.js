@@ -10,7 +10,7 @@
  */
 function getAllModelsGrouped() {
   const config = getModelConfig();
-  const quickSelect = config.available;
+  const quickSelect = config.quickSelect;
   const all = [
     { provider: 'Gemini', models: config.all.gemini },
     { provider: 'OpenAI', models: config.all.openai },
@@ -54,7 +54,9 @@ function getUserSettings() {
       apiKeys: apiKeys,
       defaultModel: defaultModel,
       defaultTemperature: parseFloat(defaultTemperature),
-      availableModels: getModelConfig().available
+      quickSelectModels: getModelConfig().quickSelect,
+      allModels: getModelConfig().all,
+      include_search_results: PropertiesService.getUserProperties().getProperty('include_search_results') === 'true'
     };
   } catch (error) {
     console.error('Failed to get user settings:', error);
@@ -62,7 +64,8 @@ function getUserSettings() {
       apiKeys: {},
       defaultModel: getModelConfig().default,
       defaultTemperature: 0,
-      availableModels: getModelConfig().available
+      quickSelectModels: getModelConfig().quickSelect,
+      allModels: getModelConfig().all
     };
   }
 }
@@ -159,7 +162,8 @@ function setDefaultModel(modelName) {
     const allModels = [
       ...config.all.gemini,
       ...config.all.openai,
-      ...config.all.anthropic
+      ...config.all.anthropic,
+      ...config.all.perplexity
     ];
 
     // Debug logging
@@ -221,7 +225,16 @@ function testApiKey(provider, apiKey) {
     
     // Get a model for this provider
     const modelConfig = getModelConfig();
-    const testModel = modelConfig.available.find(model => getProviderFromModel(model) === provider);
+    let testModel = null;
+    if (provider === 'gemini') {
+      testModel = modelConfig.all.gemini[0];
+    } else if (provider === 'openai') {
+      testModel = modelConfig.all.openai[0];
+    } else if (provider === 'anthropic') {
+      testModel = modelConfig.all.anthropic[0];
+    } else if (provider === 'perplexity') {
+      testModel = modelConfig.all.perplexity[0];
+    }
     
     if (!testModel) {
       return { success: false, message: `No available models for provider: ${provider}` };
@@ -250,6 +263,7 @@ function testApiKey(provider, apiKey) {
     return { success: true, message: `${provider} API key is valid` };
   } catch (error) {
     console.error(`Failed to test ${provider} API key:`, error);
+    Logger.log(`Failed to test ${provider} API key:`, error);
     return { success: false, message: `Error testing API key: ${error.message}` };
   }
 }

@@ -6,7 +6,7 @@
 const MODEL_CONFIG = {
   default: "gemini-2.0-flash", // Most versatile, widely supported
   // Recommended/Quick Select: latest, best-in-class models for most use cases
-  available: [
+  quickSelect: [
     // Google Gemini
     "gemini-2.0-flash",
     // OpenAI
@@ -14,7 +14,7 @@ const MODEL_CONFIG = {
     // Anthropic Claude
     "claude-3-5-sonnet-latest",
     // Perplexity
-    "sonar-medium-online",
+    "sonar",
   ],
   // Full, up-to-date list for all providers (text-only)
   all: {
@@ -55,12 +55,8 @@ const MODEL_CONFIG = {
       // Older 3.x and instant/v1 models omitted as deprecated
     ],
     perplexity: [
-      "sonar-large-online",
-      "sonar-medium-online",
-      "sonar-small-online",
-      "sonar-large-chat",
-      "sonar-medium-chat",
-      "sonar-small-chat",
+      "sonar",
+      "sonar-pro",
       // As of June 2025
     ],
   },
@@ -97,4 +93,4 @@ function getPropertyStore() {
 // Function to get API endpoints
 function getApiEndpoints() {
   return API_ENDPOINTS;
-} 
+}

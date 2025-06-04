@@ -340,7 +340,6 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
       const structureInstruction = outputType === "list" 
         ? "Please respond with a JSON array of strings."
         : "Please respond with a JSON array of arrays (matrix format).";
-      
       messages[messages.length - 1].content += "\n\n" + structureInstruction;
     }
 
@@ -350,17 +349,9 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
       temperature: parseFloat(temperature || 0)
     };
 
-    // Add search context configuration for online models
-    if (modelName.includes("-online")) {
-      data.context_config = {
-        time_frame: "any time",  // Default time frame
-        search_focus: "balanced" // Default search focus
-      };
-    }
+    const endpoint = 'https://api.perplexity.ai/chat/completions';
 
     // Make API request
-    const endpoint = 'https://api.perplexity.ai/chat/completions';
-    
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -378,7 +369,7 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
 
     // Process response
     const responseData = response.data;
-    
+
     if (responseData.error) {
       return `Error: ${responseData.error.message || JSON.stringify(responseData.error)}`;
     }
@@ -392,8 +383,9 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
 
     // Check if we should include search results
     const includeSearchResults = PropertiesService.getUserProperties().getProperty('include_search_results') === 'true';
-    const searchResults = choice.search_results || [];
-    
+    // Perplexity API: search_results is at the top level, not inside choice.message
+    const searchResults = responseData.search_results || [];
+
     // For structured outputs like list and matrix
     if (outputType === "list" || outputType === "matrix") {
       try {
@@ -406,16 +398,16 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
 
     // For text output with search results
     let finalContent = content;
-    
+
     // Append search results if enabled and available
-    if (includeSearchResults && searchResults.length > 0 && modelName.includes("-online")) {
+    if (includeSearchResults && searchResults.length > 0) {
       finalContent += "\n\n===== SEARCH RESULTS =====\n\n";
-      
+
       for (let i = 0; i < searchResults.length; i++) {
         const result = searchResults[i];
         finalContent += `[${i+1}] ${result.title || 'Untitled'}\n`;
         finalContent += `${result.url || 'No URL'}\n`;
-        finalContent += `${result.snippet || 'No snippet available'}\n\n`;
+        finalContent += `${result.date || 'No date available'}\n\n`;
       }
     }
 

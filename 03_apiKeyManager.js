@@ -1,4 +1,12 @@
 /**
+ * DEBUG: Log all stored API keys to help diagnose provider name mismatches
+ */
+function logAllStoredApiKeys() {
+  const apiKeys = getStoredApiKeys();
+  Logger.log('All stored API keys: %s', JSON.stringify(apiKeys));
+  return apiKeys;
+}
+/**
  * API Key Management module
  *
  * Provides functions to store, retrieve, validate, and remove API keys for
@@ -123,7 +131,7 @@ function getProviderFromModel(modelName) {
     return 'openai';
   } else if (modelName.startsWith('claude-')) {
     return 'anthropic';
-  } else if (modelName.startsWith('sonar-')) {
+  } else if (modelName.startsWith('sonar')) {
     return 'perplexity';
   } else {
     throw new Error(`Unknown model provider for model: ${modelName}`);

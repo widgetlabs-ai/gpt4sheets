@@ -65,7 +65,8 @@ function getUserSettings() {
       defaultModel: getModelConfig().default,
       defaultTemperature: 0,
       quickSelectModels: getModelConfig().quickSelect,
-      allModels: getModelConfig().all
+      allModels: getModelConfig().all,
+      include_search_results: false
     };
   }
 }

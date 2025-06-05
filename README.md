@@ -1,6 +1,6 @@
 # WidgetLabs Google Sheets appscript / add-on
 
-A powerful Google Sheets script (add-on) that integrates multiple AI models (Google Gemini, OpenAI, and Anthropic) directly into your spreadsheets.
+A powerful Google Sheets script (add-on) that integrates multiple AI models (Google Gemini, OpenAI, Anthropic, Perplexity) directly into your spreadsheets.
 
 <img width="1510" alt="image" src="https://github.com/user-attachments/assets/b78bcd63-c7e7-4f84-b905-99fbabba1245" />
 
@@ -13,6 +13,16 @@ A powerful Google Sheets script (add-on) that integrates multiple AI models (Goo
 - **Flexible Output**: Support for text, list, and matrix outputs
 - **User-Friendly Settings**: Simple sidebar for managing API keys and preferences
 
+## Quick Start
+1. **Make a copy of this Google sheet**:<a href="https://docs.google.com/spreadsheets/d/1XmyFYtqv_NFUHNR9lkaRH5txkOlu9S-R1z-Ctxbv34c/edit?gid=0#gid=0"> LINK </a>
+2. **Read the instructions on the welcome screen and go!**: Note that you'll need at least one API key, and approve the permissions for the script (which you own in your account!) to start using the functionality
+   
+## Quick Start for techies
+
+1. **Install the Add-on**: Deploy this code as a Google Apps Script project
+2. **Set Up API Keys**: Go to `WidgetLabs Sheets AddOn > Settings` and add your API keys
+3. **Start Using**: Use `=AI_CALL("Your prompt here")` in any cell
+
 ## Contributing
 
 We welcome contributions! Whether you're fixing bugs, adding features, or improving documentation, your help makes this project better.
@@ -23,13 +33,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, or improv
 - Coding standards and best practices
 - Testing guidelines
 - How to submit changes
-
-## Quick Start
-
-1. **Install the Add-on**: Deploy this code as a Google Apps Script project
-2. **Set Up API Keys**: Go to `WidgetLabs Sheets AddOn > Settings` and add your API keys
-3. **Start Using**: Use `=AI_CALL("Your prompt here")` in any cell
-
+  
 ## Available Functions
 
 ### AI_CALL(prompt, [inputText])

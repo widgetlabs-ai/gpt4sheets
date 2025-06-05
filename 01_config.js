@@ -6,13 +6,15 @@
 const MODEL_CONFIG = {
   default: "gemini-2.0-flash", // Most versatile, widely supported
   // Recommended/Quick Select: latest, best-in-class models for most use cases
-  available: [
+  quickSelect: [
     // Google Gemini
     "gemini-2.0-flash",
     // OpenAI
     "gpt-4.1",
     // Anthropic Claude
     "claude-3-5-sonnet-latest",
+    // Perplexity
+    "sonar",
   ],
   // Full, up-to-date list for all providers (text-only)
   all: {
@@ -52,6 +54,11 @@ const MODEL_CONFIG = {
       "claude-3-opus-latest",
       // Older 3.x and instant/v1 models omitted as deprecated
     ],
+    perplexity: [
+      "sonar",
+      "sonar-pro",
+      // As of June 2025
+    ],
   },
 };
 
@@ -69,7 +76,8 @@ const PROPERTY_STORE = {
 const API_ENDPOINTS = {
   gemini: 'https://generativelanguage.googleapis.com/v1beta/models',
   openai: 'https://api.openai.com/v1/chat/completions',
-  anthropic: 'https://api.anthropic.com/v1/messages'
+  anthropic: 'https://api.anthropic.com/v1/messages',
+  perplexity: 'https://api.perplexity.ai/chat/completions'
 };
 
 // Function to get model configuration
@@ -85,4 +93,4 @@ function getPropertyStore() {
 // Function to get API endpoints
 function getApiEndpoints() {
   return API_ENDPOINTS;
-} 
+}

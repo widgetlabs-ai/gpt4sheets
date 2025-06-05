@@ -1,4 +1,25 @@
 /**
+ * @typedef {Object} ModelGroup
+ * @property {string[]} quickSelect - List of models for quick selection.
+ * @property {Array<{provider: string, models: string[]}>} all - List of all models grouped by provider.
+ */
+
+/**
+ * Returns a grouped list of models for all providers: quick select and all models per provider
+ * @returns {ModelGroup} The grouped list of models.
+ */
+function getAllModelsGrouped() {
+  const config = getModelConfig();
+  const quickSelect = config.quickSelect;
+  const all = [
+    { provider: 'Gemini', models: config.all.gemini },
+    { provider: 'OpenAI', models: config.all.openai },
+    { provider: 'Anthropic', models: config.all.anthropic },
+    { provider: 'Perplexity', models: config.all.perplexity }
+  ];
+  return { quickSelect, all };
+}
+/**
  * Settings management module for API keys and configuration 
  *
  * Provides functions to manage user settings, API keys, and preferences for the add-on.
@@ -33,7 +54,9 @@ function getUserSettings() {
       apiKeys: apiKeys,
       defaultModel: defaultModel,
       defaultTemperature: parseFloat(defaultTemperature),
-      availableModels: getModelConfig().available
+      quickSelectModels: getModelConfig().quickSelect,
+      allModels: getModelConfig().all,
+      include_search_results: PropertiesService.getUserProperties().getProperty('include_search_results') === 'true'
     };
   } catch (error) {
     console.error('Failed to get user settings:', error);
@@ -41,7 +64,9 @@ function getUserSettings() {
       apiKeys: {},
       defaultModel: getModelConfig().default,
       defaultTemperature: 0,
-      availableModels: getModelConfig().available
+      quickSelectModels: getModelConfig().quickSelect,
+      allModels: getModelConfig().all,
+      include_search_results: false
     };
   }
 }
@@ -131,11 +156,31 @@ function removeProviderApiKey(provider) {
  * @returns {Object} Result with success status and message
  */
 function setDefaultModel(modelName) {
+    /**
+     * Determines if the environment is in debug mode.
+     * @returns {boolean} True if in debug mode, false otherwise.
+     */
+    function isDebugMode() {
+        return PropertiesService.getScriptProperties().getProperty('DEBUG_MODE') === 'true';
+    }
   try {
     const propertyStore = getPropertyStore();
-    const availableModels = getModelConfig().available;
-    
-    if (!availableModels.includes(modelName)) {
+    const config = getModelConfig();
+    // Flatten all models from all providers into a single array
+    const allModels = [
+      ...config.all.gemini,
+      ...config.all.openai,
+      ...config.all.anthropic,
+      ...config.all.perplexity
+    ];
+
+    // Debug logging
+    Logger.log('setDefaultModel called with: %s', modelName);
+    if (isDebugMode()) {
+        Logger.log('All models: %s', JSON.stringify(allModels));
+    }
+
+    if (!allModels.includes(modelName)) {
       return { success: false, message: `Invalid model: ${modelName}` };
     }
     
@@ -190,7 +235,16 @@ function testApiKey(provider, apiKey) {
     
     // Get a model for this provider
     const modelConfig = getModelConfig();
-    const testModel = modelConfig.available.find(model => getProviderFromModel(model) === provider);
+    let testModel = null;
+    if (provider === 'gemini') {
+      testModel = modelConfig.all.gemini[0];
+    } else if (provider === 'openai') {
+      testModel = modelConfig.all.openai[0];
+    } else if (provider === 'anthropic') {
+      testModel = modelConfig.all.anthropic[0];
+    } else if (provider === 'perplexity') {
+      testModel = modelConfig.all.perplexity[0];
+    }
     
     if (!testModel) {
       return { success: false, message: `No available models for provider: ${provider}` };
@@ -204,6 +258,8 @@ function testApiKey(provider, apiKey) {
       result = callOpenAIAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else if (provider === 'anthropic') {
       result = callAnthropicAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
+    } else if (provider === 'perplexity') {
+      result = callPerplexityAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else {
       return { success: false, message: `Unknown provider: ${provider}` };
     }
@@ -217,6 +273,7 @@ function testApiKey(provider, apiKey) {
     return { success: true, message: `${provider} API key is valid` };
   } catch (error) {
     console.error(`Failed to test ${provider} API key:`, error);
+    Logger.log(`Failed to test ${provider} API key:`, error);
     return { success: false, message: `Error testing API key: ${error.message}` };
   }
 }
@@ -230,7 +287,7 @@ function getApiKeyStatus() {
     const apiKeys = getStoredApiKeys();
     const status = {};
     
-    ['gemini', 'openai', 'anthropic'].forEach(provider => {
+    ['gemini', 'openai', 'anthropic', 'perplexity'].forEach(provider => {
       status[provider] = {
         configured: !!(apiKeys[provider] && apiKeys[provider].trim() !== ''),
         keyPreview: apiKeys[provider] ? `${apiKeys[provider].substring(0, 8)}...` : 'Not set'
@@ -241,5 +298,26 @@ function getApiKeyStatus() {
   } catch (error) {
     console.error('Failed to get API key status:', error);
     return {};
+  }
+}
+
+/**
+ * Saves user preferences
+ * @param {Object} formObject The form data as an object
+ * @returns {Object} Result with success status and message
+ */
+function savePreferences(formObject) {
+  try {
+    // Save the include_search_results preference (true/false)
+    if (formObject.hasOwnProperty('include_search_results')) {
+      PropertiesService.getUserProperties().setProperty('include_search_results', 'true');
+    } else {
+      PropertiesService.getUserProperties().setProperty('include_search_results', 'false');
+    }
+    
+    return { success: true, message: 'Preferences saved successfully' };
+  } catch (error) {
+    console.error('Failed to save preferences:', error);
+    return { success: false, message: `Error saving preferences: ${error.message}` };
   }
 }

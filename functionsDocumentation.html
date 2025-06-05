@@ -48,10 +48,30 @@
     </div>
     <h3>Available Models</h3>
     <ul>
-      <li><strong>Google Gemini:</strong> gemini-2.0-flash, gemini-2.5-pro-exp-03-25</li>
-      <li><strong>OpenAI:</strong> gpt-4o, gpt-4o-mini, o3-mini</li>
-      <li><strong>Anthropic:</strong> claude-3.7-sonnet, claude-3.5-sonnet, claude-haiku</li>
+      <li><strong>Google Gemini:</strong> gemini-1.5-flash, gemini-1.5-pro, gemini-1.0-pro</li>
+      <li><strong>OpenAI:</strong> gpt-4o, gpt-4-turbo, gpt-3.5-turbo</li>
+      <li><strong>Anthropic:</strong> claude-3-opus, claude-3-sonnet, claude-3-haiku</li>
+      <li><strong>Perplexity:</strong> sonar-medium-online, sonar-medium-chat</li>
     </ul>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#perplexityModels" aria-expanded="false" aria-controls="perplexityModels">
+          Perplexity Models
+        </button>
+      </h2>
+      <div id="perplexityModels" class="accordion-collapse collapse" data-bs-parent="#modelAccordion">
+        <div class="accordion-body">
+          <p>Perplexity offers two types of models:</p>
+          <ul>
+            <li><strong>Online models</strong> (e.g., sonar-medium-online) - Can search the internet for up-to-date information</li>
+            <li><strong>Chat models</strong> (e.g., sonar-medium-chat) - Operate like standard chat models without search capability</li>
+          </ul>
+          <p>For online models, search parameters are fixed to "any time" for time frame and "balanced" for search relevance.
+             If you need more advanced search controls, please file a feature request in our open-source project.</p>
+        </div>
+      </div>
+    </div>
     <h3>Getting Started</h3>
     <ol>
       <li>Go to <strong>gpt4sheets &gt; Settings</strong> in the menu</li>
@@ -60,6 +80,7 @@
           <li><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google Gemini API Key</a></li>
           <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI API Key</a></li>
           <li><a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer">Anthropic API Key</a></li>
+          <li><a href="https://www.perplexity.ai/account/api/keys/" target="_blank" rel="noopener noreferrer">Perplexity API Key</a></li>
         </ul>
       </li>
       <li>Set your preferred default model and temperature</li>

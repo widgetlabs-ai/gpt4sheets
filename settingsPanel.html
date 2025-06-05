@@ -394,6 +394,27 @@
         <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('anthropic'); return false;">Test saved key</a>
       </div>
     </div>
+
+    <div class="section">
+      <div class="section-title">Perplexity API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://dashboard.perplexity.ai/" target="_blank">Perplexity Dashboard</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="perplexity-api-key" placeholder="Enter your Perplexity API key">
+        <div class="api-key-status" id="perplexity-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <div class="button-row">
+        <button onclick="saveAndTestApiKey('perplexity')">Save</button>
+        <button class="danger" onclick="removeApiKey('perplexity')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('perplexity'); return false;">Test saved key</a>
+      </div>
+    </div>
   </div>
 
   <!-- Preferences Tab -->
@@ -425,6 +446,17 @@
       </div>
       <div class="button-row">
         <button onclick="saveDefaultTemperature()">Save</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Preferences</div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="include_search_results" name="include_search_results">
+        <label class="form-check-label" for="include_search_results">
+          Include Perplexity search results in responses
+        </label>
+        <div class="form-text">When using Perplexity models, append search results to the response</div>
       </div>
     </div>
   </div>
@@ -460,6 +492,7 @@
         <li><strong>Google Gemini</strong>: Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
         <li><strong>OpenAI</strong>: Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></li>
         <li><strong>Anthropic</strong>: Visit <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a></li>
+        <li><strong>Perplexity</strong>: Visit <a href="https://www.perplexity.ai/account/api/keys" target="_blank">Perplexity Dashboard</a></li>
       </ul>
 
       <h3>Available Models</h3>
@@ -494,26 +527,60 @@
     };
 
     function loadSettings() {
+      // Use new backend function to get grouped models
       google.script.run
         .withSuccessHandler(function(settings) {
-          // Populate model dropdown
-          const modelSelect = document.getElementById('default-model');
-          modelSelect.innerHTML = '';
-          settings.availableModels.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            if (model === settings.defaultModel) {
-              option.selected = true;
-            }
-            modelSelect.appendChild(option);
-          });
-          
-          // Set temperature
-          document.getElementById('default-temperature').value = settings.defaultTemperature;
-          
-          // Update API key status
-          updateApiKeyStatus();
+          google.script.run
+            .withSuccessHandler(function(modelGroups) {
+              const modelSelect = document.getElementById('default-model');
+              modelSelect.innerHTML = '';
+
+              // Quick Select group
+              if (modelGroups.quickSelect && modelGroups.quickSelect.length > 0) {
+                const optGroupQuick = document.createElement('optgroup');
+                optGroupQuick.label = 'Quick Select (Recommended)';
+                modelGroups.quickSelect.forEach(model => {
+                  const option = document.createElement('option');
+                  option.value = model;
+                  option.textContent = model;
+                  if (model === settings.defaultModel) option.selected = true;
+                  optGroupQuick.appendChild(option);
+                });
+                modelSelect.appendChild(optGroupQuick);
+              }
+
+              // All Models by provider
+              if (modelGroups.all && Array.isArray(modelGroups.all)) {
+                modelGroups.all.forEach(group => {
+                  const optGroup = document.createElement('optgroup');
+                  optGroup.label = group.provider + ' (All)';
+                  group.models.forEach(model => {
+                    // Avoid duplicate in quick select
+                    if (modelGroups.quickSelect && modelGroups.quickSelect.includes(model)) return;
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    if (model === settings.defaultModel) option.selected = true;
+                    optGroup.appendChild(option);
+                  });
+                  if (optGroup.children.length > 0) modelSelect.appendChild(optGroup);
+                });
+              }
+
+              // Set temperature
+              document.getElementById('default-temperature').value = settings.defaultTemperature;
+              // Set include_search_results checkbox
+              document.getElementById('include_search_results').checked = settings.include_search_results === true;
+              // Update API key status
+              updateApiKeyStatus();
+            })
+            .withFailureHandler(function(error) {
+              showNotification('Error loading model list: ' + error.message, 'error');
+              // Apply default temperature and update API key status on failure
+              document.getElementById('default-temperature').value = 0; // Default temperature
+              updateApiKeyStatus(); // Update API key status
+            })
+            .getAllModelsGrouped();
         })
         .withFailureHandler(function(error) {
           showNotification('Error loading settings: ' + error.message, 'error');
@@ -524,7 +591,7 @@
     function updateApiKeyStatus() {
       google.script.run
         .withSuccessHandler(function(status) {
-          ['gemini', 'openai', 'anthropic'].forEach(provider => {
+          ['gemini', 'openai', 'anthropic', 'perplexity'].forEach(provider => {
             const statusElement = document.getElementById(provider + '-status');
             const indicator = statusElement.querySelector('.status-indicator');
             const text = statusElement.querySelector('span');
@@ -687,9 +754,22 @@
         notification.style.display = 'none';
       }, 5000);
     }
+
+    // Add this inside your <script> tag, after loadSettings()
+    document.getElementById('include_search_results').addEventListener('change', function() {
+      const checked = this.checked;
+      google.script.run
+        .withSuccessHandler(function(result) {
+          showNotification(result.message, 'success', 'preferences-notification');
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error saving preferences: ' + error.message, 'error', 'preferences-notification');
+        })
+        .savePreferences(checked ? { include_search_results: true } : {});
+    });
   </script>
   <div style="text-align:right; font-size:11px; color:#b8860b; margin: 14px 10px 6px 0;">
     Open source project by <a href="https://widgetlabs.ai" target="_blank" style="color:#d2691e; text-decoration:none;">Widgetlabs.ai</a>
   </div>
 </body>
-</html> 
+</html>

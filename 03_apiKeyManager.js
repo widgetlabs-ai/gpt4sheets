@@ -1,4 +1,12 @@
 /**
+ * DEBUG: Log all stored API keys to help diagnose provider name mismatches
+ */
+function logAllStoredApiKeys() {
+  const apiKeys = getStoredApiKeys();
+  Logger.log('All stored API keys: %s', JSON.stringify(apiKeys));
+  return apiKeys;
+}
+/**
  * API Key Management module
  *
  * Provides functions to store, retrieve, validate, and remove API keys for
@@ -117,15 +125,18 @@ function validateApiKeyForModel(modelName) {
  * @returns {string} The provider name
  */
 function getProviderFromModel(modelName) {
-  if (modelName.startsWith('gemini-')) {
-    return 'gemini';
-  } else if (modelName.startsWith('gpt-') || modelName.startsWith('o3-')) {
-    return 'openai';
-  } else if (modelName.startsWith('claude-')) {
-    return 'anthropic';
-  } else {
-    throw new Error(`Unknown model provider for model: ${modelName}`);
+  const config = getModelConfig();
+  
+  // Check if the model exists in any provider's model list
+  for (const [provider, models] of Object.entries(config.all)) {
+    if (models.includes(modelName)) {
+      return provider.toLowerCase();
+    }
   }
+  
+  // If we get here, the model wasn't found in any provider's list
+  console.error(`Model "${modelName}" not found in MODEL_CONFIG.all. Add it to the appropriate provider's model list.`);
+  throw new Error(`Unknown model: "${modelName}". Please add it to MODEL_CONFIG or select a different model.`);
 }
 
 /**
@@ -144,4 +155,4 @@ function getAvailableProviders() {
 function hasAnyApiKeys() {
   const providers = getAvailableProviders();
   return providers.length > 0;
-} 
+}

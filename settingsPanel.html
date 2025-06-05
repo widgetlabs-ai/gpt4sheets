@@ -415,6 +415,28 @@
         <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('perplexity'); return false;">Test saved key</a>
       </div>
     </div>
+
+    <div class="section">
+      <div class="section-title">DeepSeek API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek Console</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="deepseek-api-key" placeholder="Enter your DeepSeek API key">
+        <div class="api-key-status" id="deepseek-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <div class="button-row">
+        <button onclick="saveAndTestApiKey('deepseek')">Save</button>
+        <button class="danger" onclick="removeApiKey('deepseek')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('deepseek'); return false;">Test saved key</a>
+      </div>
+    </div>
+
   </div>
 
   <!-- Preferences Tab -->
@@ -493,6 +515,7 @@
         <li><strong>OpenAI</strong>: Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></li>
         <li><strong>Anthropic</strong>: Visit <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a></li>
         <li><strong>Perplexity</strong>: Visit <a href="https://www.perplexity.ai/account/api/keys" target="_blank">Perplexity Dashboard</a></li>
+        <li><strong>DeepSeek</strong>: Visit <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek Dashboard</a></li>
       </ul>
 
       <h3>Available Models</h3>
@@ -500,6 +523,8 @@
         <li><strong>Gemini</strong>: gemini-2.0-flash, gemini-2.5-pro-exp-03-25</li>
         <li><strong>OpenAI</strong>: gpt-4o, gpt-4o-mini, o3-mini</li>
         <li><strong>Anthropic</strong>: claude-3.7-sonnet, claude-3.5-sonnet, claude-haiku</li>
+        <li><strong>Perplexity</strong>: sonar, sonar-pro</li>
+        <li><strong>DeepSeek</strong>: deepseek-v3</li>
       </ul>
     </div>
   </div>
@@ -591,7 +616,7 @@
     function updateApiKeyStatus() {
       google.script.run
         .withSuccessHandler(function(status) {
-          ['gemini', 'openai', 'anthropic', 'perplexity'].forEach(provider => {
+          ['gemini', 'openai', 'anthropic', 'perplexity', 'deepseek'].forEach(provider => {
             const statusElement = document.getElementById(provider + '-status');
             const indicator = statusElement.querySelector('.status-indicator');
             const text = statusElement.querySelector('span');

@@ -417,3 +417,90 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
     return handleError(error, 'Perplexity API');
   }
 }
+
+
+/**
+ * Calls the DeepSeek API directly.
+ *
+ * @param {string} systemPrompt - The system prompt to set context.
+ * @param {string} prompt - The user prompt.
+ * @param {string} inputText - Additional input text.
+ * @param {number} temperature - The temperature parameter (0-1).
+ * @param {string} [outputType="text"] - The output type ("text", "list", "matrix").
+ * @returns {string|Array} The API response.
+ */
+function callDeepSeekAPI(systemPrompt, prompt, inputText, temperature, outputType = "text"){
+  const modelName = "deepseek-v3"; // DeepSeek's latest model
+  try{
+    //Validate API key
+    const validation = validateApiKeyForModel(modelName);
+    if(!validation.success){
+      return validation.message;
+    }
+    //Get API key
+    const provider = getProviderFromModel(modelName);
+    const apiKey = getApiKey(provider);
+
+    //Prepare messages
+    const messages = [
+      {role: "system", content: systemPrompt},
+      {role: "user", content: prompt + (inputText ? "\n\n" + inputText : "")}
+    ];
+
+    //Add instruction for structured outputs
+    if(outputType === 'list' || outputType === 'matrix'){
+      const structureInstruction = (outputType === 'list') ? "Please respond with a JSON array of strings." : "Please respond with a JSON array of arrays (matrix format).";
+      messages[messages.length - 1].content += '\n\n' + structureInstruction;
+    }
+
+    //Prepare request data 
+    const data = {
+      model: modelName,
+      messages: messages,
+      temperature: parseFloat(temperature || 0),
+      max_tokens: 4096
+    };
+
+    //Make API request 
+    const endpoint = 'https://api.deepseek.com/v1/chat/completions';
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      payload: JSON.stringify(data)
+    };
+
+    const response = makeHttpRequest(endpoint, requestOptions);
+
+    if (!response.success) {
+      return `Error: ${response.error}`;
+    }
+
+    const responseData = response.data;
+
+    if (responseData.error) {
+      return `Error: ${responseData.error.message}`;
+    }
+
+    if (!responseData.choices || responseData.choices.length === 0) {
+      return "Error: No response generated";
+    }
+
+    const content = responseData.choices[0].message.content;
+
+    //Handled structured outputs
+    if(outputType === 'list' || outputType === 'matrix'){
+      try{
+        return JSON.parse(content);
+      } catch(parseError){
+        return `Error parsing structured response: ${parseError.message}`;
+      }
+    }
+    return content;
+    
+  } catch(error){
+    return handleError(error, 'DeepSeek API');
+  }
+}

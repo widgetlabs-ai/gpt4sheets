@@ -83,7 +83,7 @@ const API_ENDPOINTS = {
   openai: 'https://api.openai.com/v1/chat/completions',
   anthropic: 'https://api.anthropic.com/v1/messages',
   perplexity: 'https://api.perplexity.ai/chat/completions',
-  deepseek: 'https://api.deepseek.com/v1'
+  deepseek: 'https://api.deepseek.com/v1/chat/completions'
 };
 
 // Function to get model configuration

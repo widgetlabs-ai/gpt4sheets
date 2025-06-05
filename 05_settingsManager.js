@@ -245,6 +245,8 @@ function testApiKey(provider, apiKey) {
       testModel = modelConfig.all.anthropic[0];
     } else if (provider === 'perplexity') {
       testModel = modelConfig.all.perplexity[0];
+    } else if (provider === 'deepseek'){
+      testModel = modelConfig.all.deepseek[0];
     }
     
     if (!testModel) {

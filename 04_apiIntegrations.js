@@ -430,7 +430,7 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
  * @returns {string|Array} The API response.
  */
 function callDeepSeekAPI(systemPrompt, prompt, inputText, temperature, outputType = "text"){
-  const modelName = "deepseek-v3"; // DeepSeek's latest model
+  const modelName = "deepseek-chat"; // DeepSeek's latest model
   try{
     //Validate API key
     const validation = validateApiKeyForModel(modelName);
@@ -499,7 +499,7 @@ function callDeepSeekAPI(systemPrompt, prompt, inputText, temperature, outputTyp
       }
     }
     return content;
-    
+
   } catch(error){
     return handleError(error, 'DeepSeek API');
   }

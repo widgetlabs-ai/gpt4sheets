@@ -16,7 +16,7 @@ const MODEL_CONFIG = {
     // Perplexity
     "sonar",
     //Deepseek
-    "deepseek-v3"
+    "deepseek-chat"
   ],
   // Full, up-to-date list for all providers (text-only)
   all: {
@@ -62,7 +62,7 @@ const MODEL_CONFIG = {
       // As of June 2025
     ],
     deepseek: [
-      "deepseek-v3",
+      "deepseek-chat",
     ]
   },
 };

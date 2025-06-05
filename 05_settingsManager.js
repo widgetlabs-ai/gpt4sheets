@@ -15,7 +15,8 @@ function getAllModelsGrouped() {
     { provider: 'Gemini', models: config.all.gemini },
     { provider: 'OpenAI', models: config.all.openai },
     { provider: 'Anthropic', models: config.all.anthropic },
-    { provider: 'Perplexity', models: config.all.perplexity }
+    { provider: 'Perplexity', models: config.all.perplexity },
+    { provider: 'DeepSeek', models: config.all.deepseek }
   ];
   return { quickSelect, all };
 }
@@ -260,6 +261,8 @@ function testApiKey(provider, apiKey) {
       result = callAnthropicAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else if (provider === 'perplexity') {
       result = callPerplexityAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
+    } else if (provider === 'deepseek'){
+      result = callDeepSeekAPI("You are a helpful assistant", "Say 'Hello'", "", 0, "text");
     } else {
       return { success: false, message: `Unknown provider: ${provider}` };
     }
@@ -287,7 +290,7 @@ function getApiKeyStatus() {
     const apiKeys = getStoredApiKeys();
     const status = {};
     
-    ['gemini', 'openai', 'anthropic', 'perplexity'].forEach(provider => {
+    ['gemini', 'openai', 'anthropic', 'perplexity', 'deepseek'].forEach(provider => {
       status[provider] = {
         configured: !!(apiKeys[provider] && apiKeys[provider].trim() !== ''),
         keyPreview: apiKeys[provider] ? `${apiKeys[provider].substring(0, 8)}...` : 'Not set'

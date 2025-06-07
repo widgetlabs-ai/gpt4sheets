@@ -172,7 +172,8 @@ function setDefaultModel(modelName) {
       ...config.all.gemini,
       ...config.all.openai,
       ...config.all.anthropic,
-      ...config.all.perplexity
+      ...config.all.perplexity,
+      ...config.all.deepseek
     ];
 
     // Debug logging

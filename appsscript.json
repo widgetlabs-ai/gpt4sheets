@@ -1,7 +1,27 @@
 {
-  "timeZone": "America/Chicago",
+  "timeZone": "Europe/London",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/userinfo.email"
+  ],
   "dependencies": {
   },
-  "exceptionLogging": "STACKDRIVER",
-  "runtimeVersion": "V8"
+  "webapp": {
+    "access": "ANYONE",
+    "executeAs": "USER_ACCESSING"
+  },
+  "executionApi": {
+    "access": "ANYONE"
+  },
+  "sheets": {
+    "macros": [{
+      "menuName": "gpt4sheets",
+      "functionName": "onOpen",
+      "defaultShortcut": "Ctrl+Alt+Shift+A"
+    }]
+  }
 }

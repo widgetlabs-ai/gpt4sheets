@@ -63,6 +63,7 @@ const MODEL_CONFIG = {
     ],
     deepseek: [
       "deepseek-chat",
+      "deepseek-reasoner",
     ]
   },
 };

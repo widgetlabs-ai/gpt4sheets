@@ -429,8 +429,7 @@ function callPerplexityAPI(systemPrompt, prompt, inputText, temperature, modelNa
  * @param {string} [outputType="text"] - The output type ("text", "list", "matrix").
  * @returns {string|Array} The API response.
  */
-function callDeepSeekAPI(systemPrompt, prompt, inputText, temperature, outputType = "text"){
-  const modelName = "deepseek-chat"; // DeepSeek's latest model
+function callDeepSeekAPI(systemPrompt, prompt, inputText, temperature, modelName, outputType = "text"){
   try{
     //Validate API key
     const validation = validateApiKeyForModel(modelName);

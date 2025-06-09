@@ -265,7 +265,7 @@ function testApiKey(provider, apiKey) {
     } else if (provider === 'perplexity') {
       result = callPerplexityAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else if (provider === 'deepseek'){
-      result = callDeepSeekAPI("You are a helpful assistant", "Say 'Hello'", "", 0, "text");
+      result = callDeepSeekAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel,"text");
     } else {
       return { success: false, message: `Unknown provider: ${provider}` };
     }

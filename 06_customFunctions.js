@@ -47,7 +47,7 @@ function AI_CALL(prompt, inputText = "") {
     } else if (provider === 'perplexity') {
       return callPerplexityAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
     } else if (provider === 'deepseek'){
-      return callDeepSeekAPI("You are a helpful assistant", prompt, inputText, temperature, "text");
+      return callDeepSeekAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
     } else {
       return "Error: Unsupported model: " + selectedModel;
     }
@@ -137,7 +137,7 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
     } else if (provider === 'perplexity') {
       response = callPerplexityAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
     } else if (provider === 'deepseek'){
-      response = callDeepseekAPI(systemPrompt, prompt, inputText, temp, outputType);
+      response = callDeepSeekAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
     } else {
       return "Error: Unsupported model: " + selectedModel;
     }

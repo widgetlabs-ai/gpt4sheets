@@ -72,11 +72,21 @@ The following models are pre-configured for use with `AI_CALL()` and for ease of
 - `claude-3.5-sonnet`
 - `claude-haiku`
 
+### Perplexity
+- `sonar`
+- `sonar-pro`
+
+### DeepSeek
+- `deepseek-chat`
+- `deepseek-reasoner`
+
 ## Getting API Keys
 
 1. **Google Gemini**: [Google AI Studio](https://aistudio.google.com/app/apikey)
 2. **OpenAI**: [OpenAI Platform](https://platform.openai.com/api-keys)
 3. **Anthropic**: [Anthropic Console](https://console.anthropic.com/)
+4. **Perplexity**: [Perplexity Dashboard](https://www.perplexity.ai/account/api/keys)
+5. **DeepSeek**: [DeepSeel Dashboard](https://platform.deepseek.com/api_keys)
 
 ## Installation
 

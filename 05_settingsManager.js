@@ -20,6 +20,69 @@ function getAllModelsGrouped() {
   ];
   return { quickSelect, all };
 }
+
+/**
+ * The commit SHA this version is based on (updated at release time)
+ * This constant will be automatically updated by the sync script
+ * @type {string}
+ */
+const CURRENT_COMMIT_SHA = "initial";
+
+/**
+ * Checks if the current version is outdated by comparing the embedded commit SHA
+ * with the latest commit from the GitHub Atom feed
+ * 
+ * @returns {Object} Object with hasUpdate flag and relevant commit info
+ */
+function checkForUpdates() {
+  try {
+    // Fetch the public Atom feed for the main branch (no auth needed)
+    const atomFeedUrl = "https://github.com/widgetlabs-ai/gpt4sheets/commits/main.atom";
+    const response = UrlFetchApp.fetch(atomFeedUrl, { muteHttpExceptions: true });
+    
+    if (response.getResponseCode() !== 200) {
+      console.error("Failed to fetch GitHub Atom feed");
+      return { hasUpdate: false };
+    }
+    
+    // Parse the XML to get the latest commit
+    const xmlContent = response.getContentText();
+    const document = XmlService.parse(xmlContent);
+    const root = document.getRootElement();
+    const atom = XmlService.getNamespace("http://www.w3.org/2005/Atom");
+    
+    // Get the first entry (most recent commit)
+    const entries = root.getChildren("entry", atom);
+    if (entries.length === 0) return { hasUpdate: false };
+    
+    const latestEntry = entries[0];
+    
+    // Get the commit SHA from the ID
+    const idText = latestEntry.getChildText("id", atom);
+    const latestCommitSha = idText.split('/').pop();
+    
+    return {
+      hasUpdate: CURRENT_COMMIT_SHA !== latestCommitSha,
+      currentCommit: CURRENT_COMMIT_SHA,
+      latestCommit: latestCommitSha,
+      commitTitle: latestEntry.getChildText("title", atom),
+      commitUrl: latestEntry.getChild("link", atom).getAttribute("href").getValue()
+    };
+  } catch (error) {
+    console.error("Error checking for updates:", error);
+    return { hasUpdate: false };
+  }
+}
+
+/**
+ * Gets the update status for display in the UI
+ * @returns {Object} Update status information
+ */
+function getUpdateStatus() {
+  const updateStatusJson = PropertiesService.getScriptProperties().getProperty('UPDATE_STATUS');
+  return updateStatusJson ? JSON.parse(updateStatusJson) : { hasUpdate: false };
+}
+
 /**
  * Settings management module for API keys and configuration 
  *

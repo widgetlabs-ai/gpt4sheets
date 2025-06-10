@@ -231,15 +231,19 @@
     }
 
     .notification.success {
-      background: linear-gradient(135deg, #e8f5e8 0%, #d4f4d4 100%);
-      color: #2d5016;
-      border-left-color: #4caf50;
+      background-color: #e8f5e9;
+      border-left: 4px solid #4caf50;
     }
 
     .notification.error {
-      background: linear-gradient(135deg, #ffeaea 0%, #ffcccb 100%);
-      color: #721c24;
-      border-left-color: #dc143c;
+      background-color: #ffebee;
+      border-left: 4px solid #f44336;
+    }
+
+    .notification.update {
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      margin-bottom: 15px;
     }
 
     .help-content {
@@ -321,6 +325,10 @@
 
 <body>
   <div class="header">gpt4sheets Settings</div>
+
+  <div id="update-notification" class="notification update" style="display:none;">
+    A newer version of gpt4sheets is available. <a href="https://github.com/widgetlabs-ai/gpt4sheets" target="_blank">See what's new</a>
+  </div>
 
   <div class="tabs">
     <div class="tab active" id="tab-api-keys">API Keys</div>
@@ -549,7 +557,43 @@
     // Load settings on page load
     window.onload = function() {
       loadSettings();
+      checkForUpdateDisplay();
     };
+    
+    function checkForUpdateDisplay() {
+      google.script.run
+        .withSuccessHandler(function(updateStatus) {
+          const updateNotification = document.getElementById('update-notification');
+          updateNotification.style.display = 'block'; // Always display notification
+          
+          if (updateStatus && updateStatus.hasUpdate) {
+            updateNotification.innerHTML = 'A newer version of gpt4sheets is available. <a href="https://github.com/widgetlabs-ai/gpt4sheets" target="_blank">See what\'s new</a>';
+            updateNotification.style.backgroundColor = '#e3f2fd';
+            updateNotification.style.borderLeftColor = '#2196f3';
+          } else {
+            // Show "latest version" message but make it auto-disappear after 3 seconds
+            updateNotification.innerHTML = 'You are on the latest version of gpt4sheets.';
+            updateNotification.style.backgroundColor = '#e8f5e9';
+            updateNotification.style.borderLeftColor = '#4caf50';
+            
+            // Auto-hide this notification after 3 seconds
+            setTimeout(() => {
+              updateNotification.style.display = 'none';
+            }, 3000);
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error("Failed to check update status:", error);
+          
+          // Show default message on failure
+          const updateNotification = document.getElementById('update-notification');
+          updateNotification.style.display = 'block';
+          updateNotification.innerHTML = 'Unable to check for updates.';
+          updateNotification.style.backgroundColor = '#fff3e0';
+          updateNotification.style.borderLeftColor = '#ff9800';
+        })
+        .checkForUpdates();
+    }
 
     function loadSettings() {
       // Use new backend function to get grouped models

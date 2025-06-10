@@ -51,23 +51,35 @@ function checkForUpdates() {
     const root = document.getRootElement();
     const atom = XmlService.getNamespace("http://www.w3.org/2005/Atom");
     
-    // Get the first entry (most recent commit)
+    // Get all recent commits
     const entries = root.getChildren("entry", atom);
     if (entries.length === 0) return { hasUpdate: false };
     
-    const latestEntry = entries[0];
+    // Scan through commits to find the latest non-SHA-update commit
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      const title = entry.getChildText("title", atom);
+      
+      // Skip commits that are just SHA updates
+      if (title.includes("Update current commit SHA to")) {
+        continue;
+      }
+      
+      // Found a non-SHA-update commit, use this for comparison
+      const idText = entry.getChildText("id", atom);
+      const latestCommitSha = idText.replace(/\/+$/, '').split('/').pop();
     
-    // Get the commit SHA from the ID
-    const idText = latestEntry.getChildText("id", atom);
-    const latestCommitSha = idText.replace(/\/+$/, '').split('/').pop();
+      return {
+        hasUpdate: CURRENT_COMMIT_SHA !== latestCommitSha,
+        currentCommit: CURRENT_COMMIT_SHA,
+        latestCommit: latestCommitSha,
+        commitTitle: title,
+        commitUrl: entry.getChild("link", atom).getAttribute("href").getValue()
+      };
+    }
     
-    return {
-      hasUpdate: CURRENT_COMMIT_SHA !== latestCommitSha,
-      currentCommit: CURRENT_COMMIT_SHA,
-      latestCommit: latestCommitSha,
-      commitTitle: latestEntry.getChildText("title", atom),
-      commitUrl: latestEntry.getChild("link", atom).getAttribute("href").getValue()
-    };
+    // No non-SHA-update commits found
+    return { hasUpdate: false };
   } catch (error) {
     console.error("Error checking for updates:", error);
     return { hasUpdate: false };

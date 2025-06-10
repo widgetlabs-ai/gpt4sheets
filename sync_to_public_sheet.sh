@@ -13,6 +13,8 @@ echo "Pushing code to public sheet..."
 clasp push -f
 
 # Commit the updated file with the new SHA
+# Note: This commit message is important - our code specifically ignores commits with this message pattern
+# when checking for updates to avoid always showing an update notification
 git add 05_settingsManager.js
 git commit -m "Update current commit SHA to $LATEST_COMMIT"
 git push origin main

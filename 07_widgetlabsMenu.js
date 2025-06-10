@@ -13,16 +13,17 @@ function onOpen() {
     .addItem('Help & Documentation', 'showFunctionsDocumentation')
     .addToUi();
     
-  // Check for updates
-  try {
-    const updateStatus = checkForUpdates();
-    PropertiesService.getScriptProperties().setProperty(
-      'UPDATE_STATUS', 
-      JSON.stringify(updateStatus)
-    );
-  } catch (error) {
-    console.error("Failed to check for updates:", error);
-  }
+  // Check for updates asynchronously
+  checkForUpdates()
+    .then(updateStatus => {
+      PropertiesService.getScriptProperties().setProperty(
+        'UPDATE_STATUS', 
+        JSON.stringify(updateStatus)
+      );
+    })
+    .catch(error => {
+      console.error("Failed to check for updates:", error);
+    });
 }
 
 /**

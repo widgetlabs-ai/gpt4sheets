@@ -59,7 +59,7 @@ function checkForUpdates() {
     
     // Get the commit SHA from the ID
     const idText = latestEntry.getChildText("id", atom);
-    const latestCommitSha = idText.split('/').pop();
+    const latestCommitSha = idText.replace(/\/+$/, '').split('/').pop();
     
     return {
       hasUpdate: CURRENT_COMMIT_SHA !== latestCommitSha,

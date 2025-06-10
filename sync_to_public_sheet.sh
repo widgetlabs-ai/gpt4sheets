@@ -1,6 +1,23 @@
 #!/bin/bash
 # sync_to_public_sheet.sh - Script to sync code to public sheet and update commit ID
 
+# Public sheet script ID - this is the ID of the public gpt4sheets project
+# This is not sensitive and is hardcoded to prevent pushing to the wrong project
+PUBLIC_SCRIPT_ID="1CbblD1Mu2ImtTXLtHjRydPlrA6ZULVmC_qDE8A3O488XsnDCqWWrUfyh"
+
+# Verify .clasp.json has the correct script ID
+echo "Verifying .clasp.json points to the public sheet..."
+CURRENT_SCRIPT_ID=$(grep -o '"scriptId":"[^"]*"' .clasp.json | cut -d'"' -f4)
+
+if [ "$CURRENT_SCRIPT_ID" != "$PUBLIC_SCRIPT_ID" ]; then
+  echo "ERROR: .clasp.json contains incorrect script ID!"
+  echo "Current ID: $CURRENT_SCRIPT_ID"
+  echo "Expected ID: $PUBLIC_SCRIPT_ID"
+  echo "Please update .clasp.json or use the following command:"
+  echo "echo '{\"scriptId\":\"$PUBLIC_SCRIPT_ID\",\"rootDir\":\"$(pwd)\"}' > .clasp.json"
+  exit 1
+fi
+
 # Get the latest commit SHA from the main branch
 LATEST_COMMIT=$(git rev-parse HEAD)
 

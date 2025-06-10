@@ -15,7 +15,8 @@ function getAllModelsGrouped() {
     { provider: 'Gemini', models: config.all.gemini },
     { provider: 'OpenAI', models: config.all.openai },
     { provider: 'Anthropic', models: config.all.anthropic },
-    { provider: 'Perplexity', models: config.all.perplexity }
+    { provider: 'Perplexity', models: config.all.perplexity },
+    { provider: 'DeepSeek', models: config.all.deepseek }
   ];
   return { quickSelect, all };
 }
@@ -171,7 +172,8 @@ function setDefaultModel(modelName) {
       ...config.all.gemini,
       ...config.all.openai,
       ...config.all.anthropic,
-      ...config.all.perplexity
+      ...config.all.perplexity,
+      ...config.all.deepseek
     ];
 
     // Debug logging
@@ -244,6 +246,8 @@ function testApiKey(provider, apiKey) {
       testModel = modelConfig.all.anthropic[0];
     } else if (provider === 'perplexity') {
       testModel = modelConfig.all.perplexity[0];
+    } else if (provider === 'deepseek'){
+      testModel = modelConfig.all.deepseek[0];
     }
     
     if (!testModel) {
@@ -260,6 +264,8 @@ function testApiKey(provider, apiKey) {
       result = callAnthropicAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
     } else if (provider === 'perplexity') {
       result = callPerplexityAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel, "text");
+    } else if (provider === 'deepseek'){
+      result = callDeepSeekAPI("You are a helpful assistant", "Say 'Hello'", "", 0, testModel,"text");
     } else {
       return { success: false, message: `Unknown provider: ${provider}` };
     }
@@ -287,7 +293,7 @@ function getApiKeyStatus() {
     const apiKeys = getStoredApiKeys();
     const status = {};
     
-    ['gemini', 'openai', 'anthropic', 'perplexity'].forEach(provider => {
+    ['gemini', 'openai', 'anthropic', 'perplexity', 'deepseek'].forEach(provider => {
       status[provider] = {
         configured: !!(apiKeys[provider] && apiKeys[provider].trim() !== ''),
         keyPreview: apiKeys[provider] ? `${apiKeys[provider].substring(0, 8)}...` : 'Not set'

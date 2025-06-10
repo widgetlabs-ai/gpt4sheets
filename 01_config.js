@@ -15,6 +15,8 @@ const MODEL_CONFIG = {
     "claude-3-5-sonnet-latest",
     // Perplexity
     "sonar",
+    //Deepseek
+    "deepseek-chat"
   ],
   // Full, up-to-date list for all providers (text-only)
   all: {
@@ -59,6 +61,10 @@ const MODEL_CONFIG = {
       "sonar-pro",
       // As of June 2025
     ],
+    deepseek: [
+      "deepseek-chat",
+      "deepseek-reasoner",
+    ]
   },
 };
 
@@ -77,7 +83,8 @@ const API_ENDPOINTS = {
   gemini: 'https://generativelanguage.googleapis.com/v1beta/models',
   openai: 'https://api.openai.com/v1/chat/completions',
   anthropic: 'https://api.anthropic.com/v1/messages',
-  perplexity: 'https://api.perplexity.ai/chat/completions'
+  perplexity: 'https://api.perplexity.ai/chat/completions',
+  deepseek: 'https://api.deepseek.com/v1/chat/completions'
 };
 
 // Function to get model configuration

@@ -5,6 +5,11 @@ A powerful Google Sheets script (add-on) that integrates multiple AI models (Goo
 <img width="1510" alt="image" src="https://github.com/user-attachments/assets/b78bcd63-c7e7-4f84-b905-99fbabba1245" />
 
 
+
+## Quick Start
+1. **Make a copy of this Google sheet**:<a href="https://docs.google.com/spreadsheets/d/1XmyFYtqv_NFUHNR9lkaRH5txkOlu9S-R1z-Ctxbv34c/edit?gid=0#gid=0"> LINK </a> <-- If you came here because you saw a message saying an updated version is available, do the same thing. Clone this sheet to pick the latest version for your use.
+2. **Read the instructions on the welcome screen and go!**: Note that you'll need at least one API key, and approve the permissions for the script (which you own in your account!) to start using the functionality
+   
 ## Features
 
 - **Multiple AI Providers**: Support for Google Gemini, OpenAI, and Anthropic models
@@ -13,10 +18,6 @@ A powerful Google Sheets script (add-on) that integrates multiple AI models (Goo
 - **Flexible Output**: Support for text, list, and matrix outputs
 - **User-Friendly Settings**: Simple sidebar for managing API keys and preferences
 
-## Quick Start
-1. **Make a copy of this Google sheet**:<a href="https://docs.google.com/spreadsheets/d/1XmyFYtqv_NFUHNR9lkaRH5txkOlu9S-R1z-Ctxbv34c/edit?gid=0#gid=0"> LINK </a>
-2. **Read the instructions on the welcome screen and go!**: Note that you'll need at least one API key, and approve the permissions for the script (which you own in your account!) to start using the functionality
-   
 ## Quick Start for techies
 
 1. **Install the Add-on**: Deploy this code as a Google Apps Script project

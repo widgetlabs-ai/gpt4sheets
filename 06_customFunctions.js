@@ -154,3 +154,37 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
     return "Error: " + error.message;
   }
 }
+
+
+function replace_selected_formulas_with_values(){
+  //Get active spreadsheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  //Get actively selected range --> returns a 2D array
+  const range = sheet.getActiveRange();
+  const range_rows = range.getNumRows();
+  const range_cols = range.getNumColumns();
+
+  //Get values and formulas within the range
+  const values = range.getValues();
+  const formulas = range.getFormulas();
+
+  //boolean to see if active range has formulas to replace
+  let modified = false;
+
+  for(let row = 0; row<range_rows; row++){
+    for(let col = 0; col<range_cols; col++){
+      let currFormula = formulas[row][col];
+      if(currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV")){
+        modified = true;
+      } else {
+        values[row][col] = currFormula;
+      }
+    }
+  }
+  if(modified){
+    range.setValues(values);
+  } else {
+    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found.");
+  }
+}

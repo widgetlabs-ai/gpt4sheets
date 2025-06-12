@@ -154,7 +154,7 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
     return "Error: " + error.message;
   }
 }
-/*
+/**
 * Simple function to replace selected cell(s) with the values outputted by the formula call
 *
 * @customFunction
@@ -194,7 +194,7 @@ function replace_selected_formulas_with_values(){
 }
 
 
-/*
+/** 
 * Simple function to replace all cells in the spreadsheet with the values outputted by the formula call
 *
 * @customFunction

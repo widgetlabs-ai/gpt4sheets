@@ -154,8 +154,12 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
     return "Error: " + error.message;
   }
 }
-
-
+/*
+* Simple function to replace selected cell(s) with the values outputted by the formula call
+*
+* @customFunction
+*
+*/
 function replace_selected_formulas_with_values(){
   //Get active spreadsheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -166,7 +170,7 @@ function replace_selected_formulas_with_values(){
   const range_cols = range.getNumColumns();
 
   //Get values and formulas within the range
-  const values = range.getValues();
+  const values = range.getValues(); //2d array of strings
   const formulas = range.getFormulas();
 
   //boolean to see if active range has formulas to replace
@@ -174,7 +178,7 @@ function replace_selected_formulas_with_values(){
 
   for(let row = 0; row<range_rows; row++){
     for(let col = 0; col<range_cols; col++){
-      let currFormula = formulas[row][col];
+      const currFormula = formulas[row][col];
       if(currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV")){
         modified = true;
       } else {
@@ -185,6 +189,46 @@ function replace_selected_formulas_with_values(){
   if(modified){
     range.setValues(values);
   } else {
-    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found.");
+    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in selected range.");
+  }
+}
+
+
+/*
+* Simple function to replace all cells in the spreadsheet with the values outputted by the formula call
+*
+* @customFunction
+*
+*/
+function replace_all_formulas_with_values(){
+  //Get active spreadsheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  //Get minimum spanning range --> returns a 2D array
+  const range = sheet.getDataRange();
+  const range_rows = range.getNumRows();
+  const range_cols = range.getNumColumns();
+
+  //Get values and formulas within the range
+  const values = range.getValues();  //2d array of strings
+  const formulas = range.getFormulas();
+
+  //boolean to see if active range has formulas to replace
+  let modified = false;
+
+  for(let row = 0; row<range_rows; row++){
+    for(let col = 0; col<range_cols; col++){
+      const currFormula = formulas[row][col];
+      if(currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV")){
+        modified = true;
+      } else {
+        values[row][col] = currFormula;
+      }
+    }
+  }
+  if(modified){
+    range.setValues(values);
+  } else {
+    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in sheet.");
   }
 }

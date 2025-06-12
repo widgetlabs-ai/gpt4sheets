@@ -231,15 +231,19 @@
     }
 
     .notification.success {
-      background: linear-gradient(135deg, #e8f5e8 0%, #d4f4d4 100%);
-      color: #2d5016;
-      border-left-color: #4caf50;
+      background-color: #e8f5e9;
+      border-left: 4px solid #4caf50;
     }
 
     .notification.error {
-      background: linear-gradient(135deg, #ffeaea 0%, #ffcccb 100%);
-      color: #721c24;
-      border-left-color: #dc143c;
+      background-color: #ffebee;
+      border-left: 4px solid #f44336;
+    }
+
+    .notification.update {
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      margin-bottom: 15px;
     }
 
     .help-content {
@@ -322,6 +326,10 @@
 <body>
   <div class="header">gpt4sheets Settings</div>
 
+  <div id="update-notification" class="notification update" style="display:none;">
+    A newer version of gpt4sheets is available. <a href="https://github.com/widgetlabs-ai/gpt4sheets" target="_blank">See what's new</a>
+  </div>
+
   <div class="tabs">
     <div class="tab active" id="tab-api-keys">API Keys</div>
     <div class="tab" id="tab-preferences">Preferences</div>
@@ -394,6 +402,49 @@
         <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('anthropic'); return false;">Test saved key</a>
       </div>
     </div>
+
+    <div class="section">
+      <div class="section-title">Perplexity API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://dashboard.perplexity.ai/" target="_blank">Perplexity Dashboard</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="perplexity-api-key" placeholder="Enter your Perplexity API key">
+        <div class="api-key-status" id="perplexity-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <div class="button-row">
+        <button onclick="saveAndTestApiKey('perplexity')">Save</button>
+        <button class="danger" onclick="removeApiKey('perplexity')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('perplexity'); return false;">Test saved key</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">DeepSeek API Key</div>
+      <div class="section-description">
+        Get your API key from <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek Console</a>
+      </div>
+      <div class="form-group">
+        <input type="password" id="deepseek-api-key" placeholder="Enter your DeepSeek API key">
+        <div class="api-key-status" id="deepseek-status">
+          <div class="status-indicator status-not-configured"></div>
+          <span>Not configured</span>
+        </div>
+      </div>
+      <div class="button-row">
+        <button onclick="saveAndTestApiKey('deepseek')">Save</button>
+        <button class="danger" onclick="removeApiKey('deepseek')">Remove</button>
+      </div>
+      <div style="margin-top:4px; text-align:right;">
+        <a href="#" style="font-size:11px; color:#b8860b; text-decoration:underline;" onclick="testSavedKey('deepseek'); return false;">Test saved key</a>
+      </div>
+    </div>
+
   </div>
 
   <!-- Preferences Tab -->
@@ -425,6 +476,17 @@
       </div>
       <div class="button-row">
         <button onclick="saveDefaultTemperature()">Save</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Preferences</div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="include_search_results" name="include_search_results">
+        <label class="form-check-label" for="include_search_results">
+          Include Perplexity search results in responses
+        </label>
+        <div class="form-text">When using Perplexity models, append search results to the response</div>
       </div>
     </div>
   </div>
@@ -460,6 +522,8 @@
         <li><strong>Google Gemini</strong>: Visit <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
         <li><strong>OpenAI</strong>: Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></li>
         <li><strong>Anthropic</strong>: Visit <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a></li>
+        <li><strong>Perplexity</strong>: Visit <a href="https://www.perplexity.ai/account/api/keys" target="_blank">Perplexity Dashboard</a></li>
+        <li><strong>DeepSeek</strong>: Visit <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek Dashboard</a></li>
       </ul>
 
       <h3>Available Models</h3>
@@ -467,6 +531,8 @@
         <li><strong>Gemini</strong>: gemini-2.0-flash, gemini-2.5-pro-exp-03-25</li>
         <li><strong>OpenAI</strong>: gpt-4o, gpt-4o-mini, o3-mini</li>
         <li><strong>Anthropic</strong>: claude-3.7-sonnet, claude-3.5-sonnet, claude-haiku</li>
+        <li><strong>Perplexity</strong>: sonar, sonar-pro</li>
+        <li><strong>DeepSeek</strong>: deepseek-chat, deepseek-reasoner</li>
       </ul>
     </div>
   </div>
@@ -491,29 +557,99 @@
     // Load settings on page load
     window.onload = function() {
       loadSettings();
+      checkForUpdateDisplay();
     };
+    
+    function checkForUpdateDisplay() {
+      google.script.run
+        .withSuccessHandler(function(updateStatus) {
+          const updateNotification = document.getElementById('update-notification');
+          updateNotification.style.display = 'block'; // Always display notification
+          
+          if (updateStatus && updateStatus.hasUpdate) {
+            updateNotification.innerHTML = 'A newer version of gpt4sheets is available. <a href="https://github.com/widgetlabs-ai/gpt4sheets" target="_blank">See what\'s new</a>';
+            updateNotification.style.backgroundColor = '#e3f2fd';
+            updateNotification.style.borderLeftColor = '#2196f3';
+          } else {
+            // Show "latest version" message but make it auto-disappear after 3 seconds
+            updateNotification.innerHTML = 'You are on the latest version of gpt4sheets.';
+            updateNotification.style.backgroundColor = '#e8f5e9';
+            updateNotification.style.borderLeftColor = '#4caf50';
+            
+            // Auto-hide this notification after 3 seconds
+            setTimeout(() => {
+              updateNotification.style.display = 'none';
+            }, 3000);
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error("Failed to check update status:", error);
+          
+          // Show default message on failure
+          const updateNotification = document.getElementById('update-notification');
+          updateNotification.style.display = 'block';
+          updateNotification.innerHTML = 'Unable to check for updates.';
+          updateNotification.style.backgroundColor = '#fff3e0';
+          updateNotification.style.borderLeftColor = '#ff9800';
+        })
+        .checkForUpdates();
+    }
 
     function loadSettings() {
+      // Use new backend function to get grouped models
       google.script.run
         .withSuccessHandler(function(settings) {
-          // Populate model dropdown
-          const modelSelect = document.getElementById('default-model');
-          modelSelect.innerHTML = '';
-          settings.availableModels.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            if (model === settings.defaultModel) {
-              option.selected = true;
-            }
-            modelSelect.appendChild(option);
-          });
-          
-          // Set temperature
-          document.getElementById('default-temperature').value = settings.defaultTemperature;
-          
-          // Update API key status
-          updateApiKeyStatus();
+          google.script.run
+            .withSuccessHandler(function(modelGroups) {
+              const modelSelect = document.getElementById('default-model');
+              modelSelect.innerHTML = '';
+
+              // Quick Select group
+              if (modelGroups.quickSelect && modelGroups.quickSelect.length > 0) {
+                const optGroupQuick = document.createElement('optgroup');
+                optGroupQuick.label = 'Quick Select (Recommended)';
+                modelGroups.quickSelect.forEach(model => {
+                  const option = document.createElement('option');
+                  option.value = model;
+                  option.textContent = model;
+                  if (model === settings.defaultModel) option.selected = true;
+                  optGroupQuick.appendChild(option);
+                });
+                modelSelect.appendChild(optGroupQuick);
+              }
+
+              // All Models by provider
+              if (modelGroups.all && Array.isArray(modelGroups.all)) {
+                modelGroups.all.forEach(group => {
+                  const optGroup = document.createElement('optgroup');
+                  optGroup.label = group.provider + ' (All)';
+                  group.models.forEach(model => {
+                    // Avoid duplicate in quick select
+                    if (modelGroups.quickSelect && modelGroups.quickSelect.includes(model)) return;
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    if (model === settings.defaultModel) option.selected = true;
+                    optGroup.appendChild(option);
+                  });
+                  if (optGroup.children.length > 0) modelSelect.appendChild(optGroup);
+                });
+              }
+
+              // Set temperature
+              document.getElementById('default-temperature').value = settings.defaultTemperature;
+              // Set include_search_results checkbox
+              document.getElementById('include_search_results').checked = settings.include_search_results === true;
+              // Update API key status
+              updateApiKeyStatus();
+            })
+            .withFailureHandler(function(error) {
+              showNotification('Error loading model list: ' + error.message, 'error');
+              // Apply default temperature and update API key status on failure
+              document.getElementById('default-temperature').value = 0; // Default temperature
+              updateApiKeyStatus(); // Update API key status
+            })
+            .getAllModelsGrouped();
         })
         .withFailureHandler(function(error) {
           showNotification('Error loading settings: ' + error.message, 'error');
@@ -524,7 +660,7 @@
     function updateApiKeyStatus() {
       google.script.run
         .withSuccessHandler(function(status) {
-          ['gemini', 'openai', 'anthropic'].forEach(provider => {
+          ['gemini', 'openai', 'anthropic', 'perplexity', 'deepseek'].forEach(provider => {
             const statusElement = document.getElementById(provider + '-status');
             const indicator = statusElement.querySelector('.status-indicator');
             const text = statusElement.querySelector('span');
@@ -687,9 +823,22 @@
         notification.style.display = 'none';
       }, 5000);
     }
+
+    // Add this inside your <script> tag, after loadSettings()
+    document.getElementById('include_search_results').addEventListener('change', function() {
+      const checked = this.checked;
+      google.script.run
+        .withSuccessHandler(function(result) {
+          showNotification(result.message, 'success', 'preferences-notification');
+        })
+        .withFailureHandler(function(error) {
+          showNotification('Error saving preferences: ' + error.message, 'error', 'preferences-notification');
+        })
+        .savePreferences(checked ? { include_search_results: true } : {});
+    });
   </script>
   <div style="text-align:right; font-size:11px; color:#b8860b; margin: 14px 10px 6px 0;">
     Open source project by <a href="https://widgetlabs.ai" target="_blank" style="color:#d2691e; text-decoration:none;">Widgetlabs.ai</a>
   </div>
 </body>
-</html> 
+</html>

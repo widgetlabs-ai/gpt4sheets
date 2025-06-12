@@ -1,10 +1,15 @@
-# WidgetLabs Sheets AddOn for Google Sheets
+# WidgetLabs Google Sheets appscript / add-on
 
-A powerful Google Sheets add-on that integrates multiple AI models (Google Gemini, OpenAI, and Anthropic) directly into your spreadsheets.
+A powerful Google Sheets script (add-on) that integrates multiple AI models (Google Gemini, OpenAI, Anthropic, Perplexity) directly into your spreadsheets.
 
 <img width="1510" alt="image" src="https://github.com/user-attachments/assets/b78bcd63-c7e7-4f84-b905-99fbabba1245" />
 
 
+
+## Quick Start
+1. **Make a copy of this Google sheet**:<a href="https://docs.google.com/spreadsheets/d/1XmyFYtqv_NFUHNR9lkaRH5txkOlu9S-R1z-Ctxbv34c/edit?gid=0#gid=0"> LINK </a> <-- If you came here because you saw a message saying an updated version is available, do the same thing. Clone this sheet to pick the latest version for your use.
+2. **Read the instructions on the welcome screen and go!**: Note that you'll need at least one API key, and approve the permissions for the script (which you own in your account!) to start using the functionality
+   
 ## Features
 
 - **Multiple AI Providers**: Support for Google Gemini, OpenAI, and Anthropic models
@@ -12,6 +17,12 @@ A powerful Google Sheets add-on that integrates multiple AI models (Google Gemin
 - **Direct API Integration**: No third-party services required - uses your own API keys
 - **Flexible Output**: Support for text, list, and matrix outputs
 - **User-Friendly Settings**: Simple sidebar for managing API keys and preferences
+
+## Quick Start for techies
+
+1. **Install the Add-on**: Deploy this code as a Google Apps Script project
+2. **Set Up API Keys**: Go to `WidgetLabs Sheets AddOn > Settings` and add your API keys
+3. **Start Using**: Use `=AI_CALL("Your prompt here")` in any cell
 
 ## Contributing
 
@@ -23,13 +34,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, or improv
 - Coding standards and best practices
 - Testing guidelines
 - How to submit changes
-
-## Quick Start
-
-1. **Install the Add-on**: Deploy this code as a Google Apps Script project
-2. **Set Up API Keys**: Go to `WidgetLabs Sheets AddOn > Settings` and add your API keys
-3. **Start Using**: Use `=AI_CALL("Your prompt here")` in any cell
-
+  
 ## Available Functions
 
 ### AI_CALL(prompt, [inputText])
@@ -68,11 +73,21 @@ The following models are pre-configured for use with `AI_CALL()` and for ease of
 - `claude-3.5-sonnet`
 - `claude-haiku`
 
+### Perplexity
+- `sonar`
+- `sonar-pro`
+
+### DeepSeek
+- `deepseek-chat`
+- `deepseek-reasoner`
+
 ## Getting API Keys
 
 1. **Google Gemini**: [Google AI Studio](https://aistudio.google.com/app/apikey)
 2. **OpenAI**: [OpenAI Platform](https://platform.openai.com/api-keys)
 3. **Anthropic**: [Anthropic Console](https://console.anthropic.com/)
+4. **Perplexity**: [Perplexity Dashboard](https://www.perplexity.ai/account/api/keys)
+5. **DeepSeek**: [DeepSeel Dashboard](https://platform.deepseek.com/api_keys)
 
 ## Installation
 

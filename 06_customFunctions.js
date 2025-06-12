@@ -36,13 +36,18 @@ function AI_CALL(prompt, inputText = "") {
     const selectedModel = userModel || modelConfig.default;
     const temperature = parseFloat(userTemperature);
     
-    // Call the appropriate API based on the model family
-    if (selectedModel.startsWith('gemini-')) {
+    // Call the appropriate API based on the model provider
+    const provider = getProviderFromModel(selectedModel);
+    if (provider === 'gemini') {
       return callGeminiAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
-    } else if (selectedModel === 'gpt-4o' || selectedModel === 'gpt-4o-mini' || selectedModel === 'o3-mini') {
+    } else if (provider === 'openai') {
       return callOpenAIAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
-    } else if (selectedModel.startsWith('claude-')) {
+    } else if (provider === 'anthropic') {
       return callAnthropicAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
+    } else if (provider === 'perplexity') {
+      return callPerplexityAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
+    } else if (provider === 'deepseek'){
+      return callDeepSeekAPI("You are a helpful assistant", prompt, inputText, temperature, selectedModel, "text");
     } else {
       return "Error: Unsupported model: " + selectedModel;
     }
@@ -120,14 +125,19 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
       return validation.message;
     }
     
-    // Call the appropriate API based on the model family
+    // Call the appropriate API based on the model provider
+    const provider = getProviderFromModel(selectedModel);
     let response;
-    if (selectedModel.startsWith('gemini-')) {
+    if (provider === 'gemini') {
       response = callGeminiAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
-    } else if (selectedModel === 'gpt-4o' || selectedModel === 'gpt-4o-mini' || selectedModel === 'o3-mini') {
+    } else if (provider === 'openai') {
       response = callOpenAIAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
-    } else if (selectedModel.startsWith('claude-')) {
+    } else if (provider === 'anthropic') {
       response = callAnthropicAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
+    } else if (provider === 'perplexity') {
+      response = callPerplexityAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
+    } else if (provider === 'deepseek'){
+      response = callDeepSeekAPI(systemPrompt, prompt, inputText, temp, selectedModel, outputType);
     } else {
       return "Error: Unsupported model: " + selectedModel;
     }

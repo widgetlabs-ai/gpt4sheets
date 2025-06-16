@@ -264,3 +264,48 @@ function replace_all_formulas_with_values(){
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in sheet.");
   }
 }
+
+
+/** 
+* Simple function to replace all cells in the spreadsheet with the values that had use of an AI CALL previously with the prior formula
+*
+* @customFunction
+*
+*/
+function replace_values_with_formulas(){
+  //get basic info on current sheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getActiveRange();
+  const values = range.getValues();
+
+  //get info on range
+  const num_rows = range.getNumRows();
+  const num_cols = range.getNumColumns();
+  const startRow = range.getRow();
+  const startCol = range.getColumn();
+
+  //get backup sheet and its formulas
+  const backupSheet = getBackupSheet();
+  let backupFormulas = backupSheet.getRange(startRow, startCol, num_rows, num_cols).getFormulas();
+
+  let to_replace = false;
+  for(let row = 0; row<num_rows; row++){
+    for(let col = 0; col<num_cols; col++){
+      const currFormula = backupFormulas[row][col];
+      if(currFormula && currFormula !== ""){
+        to_replace = true;
+        values[row][col] = currFormula;
+        backupFormulas[row][col] = "";
+      } else {
+        continue;
+      }
+    }
+  }
+  if(to_replace){
+    range.setValues(values); //set values
+    backupSheet.getRange(startRow, startCol, num_rows, num_cols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
+  } else {
+    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found to replace in current sheet.");
+  }
+}
+

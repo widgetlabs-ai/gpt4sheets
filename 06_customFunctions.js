@@ -164,30 +164,46 @@ function replace_selected_formulas_with_values(){
   //Get active spreadsheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
+  //warning so that you dont run it on itself  
+  if (sheet.getName() === "__AI__BACKUP__DO__NOT__TOUCH") {
+    SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
+    return;
+  }
+
+  //Get backup sheet
+  const backupSheet = getBackupSheet();
+
   //Get actively selected range --> returns a 2D array
   const range = sheet.getActiveRange();
-  const range_rows = range.getNumRows();
-  const range_cols = range.getNumColumns();
+  const num_rows = range.getNumRows();
+  const num_cols = range.getNumColumns();
+
+  //get the starting row and col
+  const startRow = range.getRow();
+  const startCol = range.getColumn();
 
   //Get values and formulas within the range
   const values = range.getValues(); //2d array of strings
   const formulas = range.getFormulas();
+  const backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
 
   //boolean to see if active range has formulas to replace
   let modified = false;
 
-  for(let row = 0; row<range_rows; row++){
-    for(let col = 0; col<range_cols; col++){
+  for(let row = 0; row<num_rows; row++){
+    for(let col = 0; col<num_cols; col++){
       const currFormula = formulas[row][col];
-      if(currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV")){
+      if(currFormula && (currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV"))){
         modified = true;
       } else {
         values[row][col] = currFormula;
+        backupFormulas[row][col] = "";
       }
     }
   }
   if(modified){
     range.setValues(values);
+    backupSheet.getRange(startRow, startCol, num_rows, num_cols).setFormulas(backupFormulas);
   } else {
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in selected range.");
   }
@@ -204,23 +220,38 @@ function replace_all_formulas_with_values(){
   //Get active spreadsheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
+  //warning so that you dont run it on itself  
+  if (sheet.getName() === "__AI__BACKUP__DO__NOT__TOUCH") {
+    SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
+    return;
+  }
+
+  //get accessn to the backup sheet
+  const backupSheet = getBackupSheet();
+
   //Get minimum spanning range --> returns a 2D array
   const range = sheet.getDataRange();
-  const range_rows = range.getNumRows();
-  const range_cols = range.getNumColumns();
+  const num_rows = range.getNumRows();
+  const num_cols = range.getNumColumns();
+
+  //get the starting row and col
+  const startRow = range.getRow();
+  const startCol = range.getColumn();
 
   //Get values and formulas within the range
   const values = range.getValues();  //2d array of strings
   const formulas = range.getFormulas();
+  const backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
 
   //boolean to see if active range has formulas to replace
   let modified = false;
 
-  for(let row = 0; row<range_rows; row++){
-    for(let col = 0; col<range_cols; col++){
+  for(let row = 0; row<num_rows; row++){
+    for(let col = 0; col<num_cols; col++){
       const currFormula = formulas[row][col];
-      if(currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV")){
+      if(currFormula && (currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV"))){
         modified = true;
+        backupFormulas[row][col] = "";
       } else {
         values[row][col] = currFormula;
       }
@@ -228,6 +259,7 @@ function replace_all_formulas_with_values(){
   }
   if(modified){
     range.setValues(values);
+    backupSheet.getRange(startRow, startCol, num_rows, num_cols).setFormulas(backupFormulas);
   } else {
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in sheet.");
   }

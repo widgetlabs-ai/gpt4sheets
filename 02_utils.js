@@ -171,3 +171,19 @@ function safeToString(value) {
   }
   return value.toString();
 }
+
+
+/** 
+* Helper to ensure backupsheet is made and exists
+* 
+* @returns {sheet} the backup sheet we want to access
+*/
+function getBackupSheet(){
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let backupSheet = spreadsheet.getSheetByName("__AI__BACKUP__DO__NOT__TOUCH");
+  if(!backupSheet){
+    backupSheet = spreadsheet.insertSheet("__AI__BACKUP__DO__NOT__TOUCH");
+    backupSheet.hideSheet();
+  }
+  return backupSheet;
+}

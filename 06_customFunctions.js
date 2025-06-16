@@ -175,23 +175,23 @@ function replace_selected_formulas_with_values(){
 
   //Get actively selected range --> returns a 2D array
   const range = sheet.getActiveRange();
-  const num_rows = range.getNumRows();
-  const num_cols = range.getNumColumns();
+  const numRows = range.getNumRows();
+  const numCols = range.getNumColumns();
 
   //get the starting row and col
   const startRow = range.getRow();
   const startCol = range.getColumn();
 
   //Get values and formulas within the range
-  const values = range.getValues(); //2d array of strings
+  let values = range.getValues(); //2d array of strings
   const formulas = range.getFormulas();
-  const backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
+  let backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
 
   //boolean to see if active range has formulas to replace
   let modified = false;
 
-  for(let row = 0; row<num_rows; row++){
-    for(let col = 0; col<num_cols; col++){
+  for(let row = 0; row<numRows; row++){
+    for(let col = 0; col<numCols; col++){
       const currFormula = formulas[row][col];
       if(currFormula && (currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV"))){
         modified = true;
@@ -203,7 +203,7 @@ function replace_selected_formulas_with_values(){
   }
   if(modified){
     range.setValues(values);
-    backupSheet.getRange(startRow, startCol, num_rows, num_cols).setFormulas(backupFormulas);
+    backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas);
   } else {
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in selected range.");
   }
@@ -231,23 +231,23 @@ function replace_all_formulas_with_values(){
 
   //Get minimum spanning range --> returns a 2D array
   const range = sheet.getDataRange();
-  const num_rows = range.getNumRows();
-  const num_cols = range.getNumColumns();
+  const numRows = range.getNumRows();
+  const numCols = range.getNumColumns();
 
   //get the starting row and col
   const startRow = range.getRow();
   const startCol = range.getColumn();
 
   //Get values and formulas within the range
-  const values = range.getValues();  //2d array of strings
+  let values = range.getValues();  //2d array of strings
   const formulas = range.getFormulas();
-  const backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
+  let backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
 
   //boolean to see if active range has formulas to replace
   let modified = false;
 
-  for(let row = 0; row<num_rows; row++){
-    for(let col = 0; col<num_cols; col++){
+  for(let row = 0; row<numRows; row++){
+    for(let col = 0; col<numCols; col++){
       const currFormula = formulas[row][col];
       if(currFormula && (currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV"))){
         modified = true;
@@ -259,7 +259,7 @@ function replace_all_formulas_with_values(){
   }
   if(modified){
     range.setValues(values);
-    backupSheet.getRange(startRow, startCol, num_rows, num_cols).setFormulas(backupFormulas);
+    backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas);
   } else {
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in sheet.");
   }
@@ -272,25 +272,25 @@ function replace_all_formulas_with_values(){
 * @customFunction
 *
 */
-function replace_values_with_formulas(){
-  //get basic info on current sheet
+function replace_selected_values_with_formulas(){
+  //get basic metadata on current sheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getActiveRange();
-  const values = range.getValues();
+  let values = range.getValues();
 
-  //get info on range
-  const num_rows = range.getNumRows();
-  const num_cols = range.getNumColumns();
+  //get metadata on range
+  const numRows = range.getNumRows();
+  const numCols = range.getNumColumns();
   const startRow = range.getRow();
   const startCol = range.getColumn();
 
   //get backup sheet and its formulas
   const backupSheet = getBackupSheet();
-  let backupFormulas = backupSheet.getRange(startRow, startCol, num_rows, num_cols).getFormulas();
+  let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getFormulas();
 
   let to_replace = false;
-  for(let row = 0; row<num_rows; row++){
-    for(let col = 0; col<num_cols; col++){
+  for(let row = 0; row<numRows; row++){
+    for(let col = 0; col<numCols; col++){
       const currFormula = backupFormulas[row][col];
       if(currFormula && currFormula !== ""){
         to_replace = true;
@@ -303,9 +303,45 @@ function replace_values_with_formulas(){
   }
   if(to_replace){
     range.setValues(values); //set values
-    backupSheet.getRange(startRow, startCol, num_rows, num_cols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
+    backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
   } else {
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found to replace in current sheet.");
   }
 }
 
+function replace_all_values_with_formulas(){
+  //get sheet and other basic metadata
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getDataRange();
+  let values = range.getValues();
+
+  //get metadata on range
+  const startRow = range.getRow();
+  const startCol = range.getColumn();
+  const numRows = range.getNumRows();
+  const numCols = range.getNumColumns();
+
+  //get backupsheet + backup formulas
+  const backupSheet = getBackupSheet();
+  let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getFormulas();
+
+  let to_replace = false;
+
+  for(let row = 0; row<numRows; row++){
+    for(let col = 0; col<numCols; col++){
+      const currFormula = backupFormulas[row][col];
+      if(currFormula && currFormula !== ""){
+        to_replace = true;
+        values[row][col] = currFormula;
+      } else {
+        continue;
+      }
+    }
+  }
+  if(to_replace){
+    range.setValues(values);
+    SpreadsheetApp.getActiveSpreadsheet().deleteSheet(backupSheet); //free memory for better performance since we replace everything that is stored
+  } else {
+    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found to replace in current sheet.");
+  }
+}

@@ -267,7 +267,7 @@ function replace_all_formulas_with_values(){
 
 
 /** 
-* Simple function to replace all cells in the spreadsheet with the values that had use of an AI CALL previously with the prior formula
+* Simple function to replace select cells in the spreadsheet with the values that had use of an AI CALL previously with the prior formula
 *
 * @customFunction
 *
@@ -309,6 +309,13 @@ function replace_selected_values_with_formulas(){
   }
 }
 
+
+/** 
+* Simple function to replace all cells in the spreadsheet with the values that had use of an AI CALL previously with the prior formula
+*
+* @customFunction
+*
+*/
 function replace_all_values_with_formulas(){
   //get sheet and other basic metadata
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();

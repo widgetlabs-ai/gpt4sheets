@@ -206,10 +206,17 @@ function formulas_to_values(sheet, range){
   //boolean to see if active range has formulas to replace
   let modified = false;
 
+  //get set of sheet functions
+  const set_functions = getSheetFunctions();
+
   for(let row = 0; row<numRows; row++){
     for(let col = 0; col<numCols; col++){
       const currFormula = formulas[row][col];
-      if(currFormula && (currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV"))){
+      let currPrefix = "";
+      if(currFormula){
+        currPrefix = currFormula.split('(')[0];
+      } 
+      if(currFormula && set_functions.has(currPrefix)){
         modified = true;
       } else {
         values[row][col] = currFormula;
@@ -241,6 +248,9 @@ function replace_all_values_with_formulas(){
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getDataRange();
   values_to_formulas(sheet, range);
+  const sheetName = sheet.getName() + "__BACKUP";
+  const backupSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  SpreadsheetApp.getActiveSpreadsheet().deleteSheet(backupSheet);
 }
 
 

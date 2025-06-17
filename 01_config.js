@@ -87,6 +87,16 @@ const API_ENDPOINTS = {
   deepseek: 'https://api.deepseek.com/v1/chat/completions'
 };
 
+/**
+ * In-sheet used functions
+ * NOTE: Since formulas in google sheets are returned as strings we are looking at the prefix of the formula i.e. before the opening parenthesis
+ * O(1)* lookup
+ */
+const SHEET_FUNCTIONS = new Set ([
+  "AI_CALL",
+  "AI_CALL_ADV"
+]);
+
 // Function to get model configuration
 function getModelConfig() {
   return MODEL_CONFIG;
@@ -100,4 +110,9 @@ function getPropertyStore() {
 // Function to get API endpoints
 function getApiEndpoints() {
   return API_ENDPOINTS;
+}
+
+//Function to get the set of sheetFunctions 
+function getSheetFunctions(){
+  return SHEET_FUNCTIONS
 }

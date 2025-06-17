@@ -175,9 +175,9 @@ function safeToString(value) {
 
 /** 
 * Helper to ensure backupsheet is made and exists
-* @param {sheet} the current sheet we want to make a backup copy for
+* @param {SpreadsheetApp->spreadsheet->sheet} the current sheet we want to make a backup copy for
 
-* @returns {sheet} the backup sheet we want to access
+* @returns {SpreadsheetApp->spreadsheet->sheet} the backup sheet we want to access
 */
 function getBackupSheet(sheet){
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();

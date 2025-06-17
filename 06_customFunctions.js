@@ -154,31 +154,47 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
     return "Error: " + error.message;
   }
 }
-/**
-* Simple function to replace selected cell(s) with the values outputted by the formula call
-*
-* @customFunction
-*
-*/
-function replace_selected_formulas_with_values(){
-  //Get active spreadsheet
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
+
+/**
+ * Base function for formulas -> values for selected range
+ */
+function replace_selected_formulas_with_values(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getActiveRange();
+  formulas_to_values(sheet, range)
+}
+
+/**
+ * Base function for formulas -> values for all range
+ */
+function replace_all_formulas_with_values(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getDataRange();
+  formulas_to_values(sheet, range)
+}
+
+
+/**
+ * Templated formula -> value function for easier code readability
+ * 
+ * @param {SpreadsheetApp.getActiveSheet} sheet --> the currenr sheet we are operating on 
+ * @param {SpreadsheetApp.getActiveSheet.getActiveRange} range --> the MSM (minimum spanning matrix of the selected data values [custom/all])
+ * @returns 
+ */
+function formulas_to_values(sheet, range){
   //warning so that you dont run it on itself  
-  if (sheet.getName() === "__AI__BACKUP__DO__NOT__TOUCH") {
+  if (sheet.getName().endsWith("__BACKUP")) {
     SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
     return;
   }
 
   //Get backup sheet
-  const backupSheet = getBackupSheet();
+  const backupSheet = getBackupSheet(sheet);
 
-  //Get actively selected range --> returns a 2D array
-  const range = sheet.getActiveRange();
+  //Get metadata on the range
   const numRows = range.getNumRows();
   const numCols = range.getNumColumns();
-
-  //get the starting row and col
   const startRow = range.getRow();
   const startCol = range.getColumn();
 
@@ -209,61 +225,6 @@ function replace_selected_formulas_with_values(){
   }
 }
 
-
-/** 
-* Simple function to replace all cells in the spreadsheet with the values outputted by the formula call
-*
-* @customFunction
-*
-*/
-function replace_all_formulas_with_values(){
-  //Get active spreadsheet
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
-  //warning so that you dont run it on itself  
-  if (sheet.getName() === "__AI__BACKUP__DO__NOT__TOUCH") {
-    SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
-    return;
-  }
-
-  //get accessn to the backup sheet
-  const backupSheet = getBackupSheet();
-
-  //Get minimum spanning range --> returns a 2D array
-  const range = sheet.getDataRange();
-  const numRows = range.getNumRows();
-  const numCols = range.getNumColumns();
-
-  //get the starting row and col
-  const startRow = range.getRow();
-  const startCol = range.getColumn();
-
-  //Get values and formulas within the range
-  let values = range.getValues();  //2d array of strings
-  const formulas = range.getFormulas();
-  let backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
-
-  //boolean to see if active range has formulas to replace
-  let modified = false;
-
-  for(let row = 0; row<numRows; row++){
-    for(let col = 0; col<numCols; col++){
-      const currFormula = formulas[row][col];
-      if(currFormula && (currFormula.includes("AI_CALL") || currFormula.includes("AI_CALL_ADV"))){
-        modified = true;
-        backupFormulas[row][col] = "";
-      } else {
-        values[row][col] = currFormula;
-      }
-    }
-  }
-  if(modified){
-    range.setValues(values);
-    backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas);
-  } else {
-    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in sheet.");
-  }
-}
 
 
 /** 

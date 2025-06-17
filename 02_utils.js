@@ -175,14 +175,17 @@ function safeToString(value) {
 
 /** 
 * Helper to ensure backupsheet is made and exists
-* 
+* @param {sheet} the current sheet we want to make a backup copy for
+
 * @returns {sheet} the backup sheet we want to access
 */
-function getBackupSheet(){
+function getBackupSheet(sheet){
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  let backupSheet = spreadsheet.getSheetByName("__AI__BACKUP__DO__NOT__TOUCH");
+  const sheetName = sheet.getName();
+  const backupSheetName = sheetName + "__BACKUP";
+  let backupSheet = spreadsheet.getSheetByName(backupSheetName);
   if(!backupSheet){
-    backupSheet = spreadsheet.insertSheet("__AI__BACKUP__DO__NOT__TOUCH");
+    backupSheet = spreadsheet.insertSheet(backupSheetName);
     backupSheet.hideSheet();
   }
   return backupSheet;

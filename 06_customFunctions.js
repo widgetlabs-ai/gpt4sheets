@@ -178,8 +178,8 @@ function replace_all_formulas_with_values(){
 /**
  * Templated formula -> value function for easier code readability
  * 
- * @param {SpreadsheetApp.getActiveSheet} sheet --> the currenr sheet we are operating on 
- * @param {SpreadsheetApp.getActiveSheet.getActiveRange} range --> the MSM (minimum spanning matrix of the selected data values [custom/all])
+ * @param {SpreadsheetApp->spreadsheet->sheet} sheet --> the currenr sheet we are operating on 
+ * @param {sheet->range} range --> the MSM (minimum spanning matrix of the selected data values [custom/all])
  * @returns 
  */
 function formulas_to_values(sheet, range){
@@ -225,18 +225,39 @@ function formulas_to_values(sheet, range){
   }
 }
 
-
-
-/** 
-* Simple function to replace select cells in the spreadsheet with the values that had use of an AI CALL previously with the prior formula
-*
-* @customFunction
-*
-*/
+/**
+ * Base function for values -> formulas for selected range
+ */
 function replace_selected_values_with_formulas(){
-  //get basic metadata on current sheet
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getActiveRange();
+  values_to_formulas(sheet, range);
+}
+
+/**
+ * Base function for values -> formulas for entire range
+ */
+function replace_all_values_with_formulas(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getDataRange();
+  values_to_formulas(sheet, range);
+}
+
+
+/**
+ * 
+ * @param {SpreadsheetApp->spreadsheet->sheet} sheet --> the current sheet we are operating on 
+ * @param {sheet->range} range --> the range of the sheet we are operating on
+ * @returns 
+ */
+function values_to_formulas(sheet, range){
+  //warning so that you dont run it on itself  
+  if (sheet.getName().endsWith("__BACKUP")) {
+    SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
+    return;
+  }
+
+  //get values on current sheet
   let values = range.getValues();
 
   //get metadata on range
@@ -246,7 +267,7 @@ function replace_selected_values_with_formulas(){
   const startCol = range.getColumn();
 
   //get backup sheet and its formulas
-  const backupSheet = getBackupSheet();
+  const backupSheet = getBackupSheet(sheet);
   let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getFormulas();
 
   let to_replace = false;
@@ -266,50 +287,6 @@ function replace_selected_values_with_formulas(){
     range.setValues(values); //set values
     backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
   } else {
-    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found to replace in current sheet.");
-  }
-}
-
-
-/** 
-* Simple function to replace all cells in the spreadsheet with the values that had use of an AI CALL previously with the prior formula
-*
-* @customFunction
-*
-*/
-function replace_all_values_with_formulas(){
-  //get sheet and other basic metadata
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const range = sheet.getDataRange();
-  let values = range.getValues();
-
-  //get metadata on range
-  const startRow = range.getRow();
-  const startCol = range.getColumn();
-  const numRows = range.getNumRows();
-  const numCols = range.getNumColumns();
-
-  //get backupsheet + backup formulas
-  const backupSheet = getBackupSheet();
-  let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getFormulas();
-
-  let to_replace = false;
-
-  for(let row = 0; row<numRows; row++){
-    for(let col = 0; col<numCols; col++){
-      const currFormula = backupFormulas[row][col];
-      if(currFormula && currFormula !== ""){
-        to_replace = true;
-        values[row][col] = currFormula;
-      } else {
-        continue;
-      }
-    }
-  }
-  if(to_replace){
-    range.setValues(values);
-    SpreadsheetApp.getActiveSpreadsheet().deleteSheet(backupSheet); //free memory for better performance since we replace everything that is stored
-  } else {
-    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found to replace in current sheet.");
+    SpreadsheetApp.getUi().alert("No custom formulas found to replace in current sheet.");
   }
 }

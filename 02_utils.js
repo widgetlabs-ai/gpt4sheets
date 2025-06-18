@@ -181,8 +181,8 @@ function safeToString(value) {
 */
 function getBackupSheet(sheet){
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetName = sheet.getName();
-  const backupSheetName = sheetName + "__BACKUP";
+  const sheetID = sheet.getSheetId();
+  const backupSheetName = "" + sheetID + "_BCKFM";
   let backupSheet = spreadsheet.getSheetByName(backupSheetName);
   if(!backupSheet){
     backupSheet = spreadsheet.insertSheet(backupSheetName);

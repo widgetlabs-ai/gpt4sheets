@@ -184,7 +184,7 @@ function replace_all_formulas_with_values(){
  */
 function formulas_to_values(sheet, range){
   //warning so that you dont run it on itself  
-  if (sheet.getName().endsWith("__BACKUP")) {
+  if (sheet.getName().endsWith("_BCKFM")) {
     SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
     return;
   }
@@ -205,7 +205,7 @@ function formulas_to_values(sheet, range){
   let formulas = range.getFormulas();
   let backupFormulasAsText = formulas.map(row => [...row]); // deep copy of formulas to modify
 
-  //boolean to see if active range has formulas to replace
+  //boolean to see if range has formulas to replace
   let modified = false;
 
   //get set of sheet functions
@@ -265,7 +265,7 @@ function replace_all_values_with_formulas(){
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getDataRange();
   values_to_formulas(sheet, range);
-  const sheetName = sheet.getName() + "__BACKUP";
+  const sheetName = sheet.getName() + "_BCKFM";
   const backupSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   SpreadsheetApp.getActiveSpreadsheet().deleteSheet(backupSheet);
 }
@@ -279,7 +279,7 @@ function replace_all_values_with_formulas(){
  */
 function values_to_formulas(sheet, range){
   //warning so that you dont run it on itself  
-  if (sheet.getName().endsWith("__BACKUP")) {
+  if (sheet.getName().endsWith("_BCKFM")) {
     SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
     return;
   }

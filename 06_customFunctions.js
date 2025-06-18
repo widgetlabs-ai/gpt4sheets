@@ -198,10 +198,12 @@ function formulas_to_values(sheet, range){
   const startRow = range.getRow();
   const startCol = range.getColumn();
 
-  //Get values and formulas within the range
-  let values = range.getValues(); //2d array of strings
-  const formulas = range.getFormulas();
-  let backupFormulas = formulas.map(row => [...row]); // deep copy of formulas to modify
+  //Get values 
+  let values = range.getValues(); 
+
+  //get formulas and a deep copy of formulas to save
+  let formulas = range.getFormulas();
+  let backupFormulasAsText = formulas.map(row => [...row]); // deep copy of formulas to modify
 
   //boolean to see if active range has formulas to replace
   let modified = false;
@@ -212,21 +214,36 @@ function formulas_to_values(sheet, range){
   for(let row = 0; row<numRows; row++){
     for(let col = 0; col<numCols; col++){
       const currFormula = formulas[row][col];
-      let currPrefix = "";
-      if(currFormula){
-        currPrefix = currFormula.split('(')[0];
-      } 
-      if(currFormula && set_functions.has(currPrefix)){
-        modified = true;
+      if(currFormula !== ""){
+        //there is a formula to check
+        const formulaPrefix = currFormula.split('(')[0].trim().toUpperCase();
+        if(set_functions.has(formulaPrefix)){
+          //there is a function we want to save
+          modified = true;
+          backupFormulasAsText[row][col] = "'" + currFormula; //save it as a string to preserve LLM calls
+          formulas[row][col] = ""; //empty formula so when we override value will stay
+
+          // values[row][col] = values[row][col] no-op but systematically save values to what it is
+
+        } else {
+          //there is a formula but we want to preserve it
+
+          // formulas[row][col] = formulas[row][col]; no-op but systematically makes sense to preserve formula
+        }
       } else {
-        values[row][col] = currFormula;
-        backupFormulas[row][col] = "";
+        //there is a hardcoded value here with no formula
+
+        formulas[row][col] = ""; //make sure that no formula gets saved
+
+        // values[row][col] = values[row][col]; no-op but systematically makes sense to preserve value
       }
     }
   }
   if(modified){
+    // Reapply non-LLM formulas, remove LLM formulas
     range.setValues(values);
-    backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas);
+    range.setFormulas(formulas);
+    backupSheet.getRange(startRow, startCol, numRows, numCols).setValues(backupFormulasAsText);
   } else {
     SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in selected range.");
   }

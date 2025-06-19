@@ -241,7 +241,7 @@ function formulas_to_values(sheet, range){
   }
   if(modified){
     // Reapply non-LLM formulas, remove LLM formulas
-    range.setValues(values);
+    range.setValues(values); //set values first so then we can do google sheets formulas on top to preserve
     range.setFormulas(formulas);
     backupSheet.getRange(startRow, startCol, numRows, numCols).setValues(backupFormulasAsText);
   } else {
@@ -265,7 +265,7 @@ function replace_all_values_with_formulas(){
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = sheet.getDataRange();
   values_to_formulas(sheet, range);
-  const sheetName = sheet.getName() + "_BCKFM";
+  const sheetName = "" + sheet.getSheetId() + "_BCKFM";
   const backupSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   SpreadsheetApp.getActiveSpreadsheet().deleteSheet(backupSheet);
 }

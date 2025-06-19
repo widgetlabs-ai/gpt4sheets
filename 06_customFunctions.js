@@ -287,6 +287,9 @@ function values_to_formulas(sheet, range){
   //get values on current sheet
   let values = range.getValues();
 
+  //get formulas on current sheet
+  let formulas = range.getFormulas();
+
   //get metadata on range
   const numRows = range.getNumRows();
   const numCols = range.getNumColumns();
@@ -295,23 +298,27 @@ function values_to_formulas(sheet, range){
 
   //get backup sheet and its formulas
   const backupSheet = getBackupSheet(sheet);
-  let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getFormulas();
+  let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getValues();
 
   let to_replace = false;
   for(let row = 0; row<numRows; row++){
     for(let col = 0; col<numCols; col++){
-      const currFormula = backupFormulas[row][col];
-      if(currFormula && currFormula !== ""){
+      const currBackup = backupFormulas[row][col];
+      if(currBackup && currBackup !== ""){
+        //there exists a backupFormula we want to replace
         to_replace = true;
-        values[row][col] = currFormula;
-        backupFormulas[row][col] = "";
+        const currFormula = currBackup.substring(1);
+        formulas[row][col] = currFormula; //set the formulas in the corresponding cell of the main sheet to the backup formula
+        backupFormulas[row][col] = ""; //no need to save the formula anymore
       } else {
-        continue;
+        //there is no backup formula and there is nothing to do
+
+        //values[row][col] = values[row][col] <-- this is a no op but it is implied that the values stay the same
       }
     }
   }
   if(to_replace){
-    range.setValues(values); //set values
+    range.setFormulas(formulas) //set formulas to include custom functions
     backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
   } else {
     SpreadsheetApp.getUi().alert("No custom formulas found to replace in current sheet.");

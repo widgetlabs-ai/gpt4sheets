@@ -211,41 +211,41 @@ function formulas_to_values(sheet, range){
   //get set of sheet functions
   const set_functions = getSheetFunctions();
 
-  for(let row = 0; row<numRows; row++){
-    for(let col = 0; col<numCols; col++){
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
       const currFormula = formulas[row][col];
-      if(currFormula !== ""){
-        //there is a formula to check
-        const formulaPrefix = currFormula.split('(')[0].trim().toUpperCase();
-        if(set_functions.has(formulaPrefix)){
-          //there is a function we want to save
+
+      if (currFormula) {
+        let formulaPrefix = currFormula.split('(')[0].trim().toUpperCase();
+        formulaPrefix = formulaPrefix.substring(1); // remove '='
+
+        if (set_functions.has(formulaPrefix)) {
+          // Case 1: AI formula
           modified = true;
-          backupFormulasAsText[row][col] = "'" + currFormula; //save it as a string to preserve LLM calls
-          formulas[row][col] = ""; //empty formula so when we override value will stay
-
-          // values[row][col] = values[row][col] no-op but systematically save values to what it is
-
+          backupFormulasAsText[row][col] = "'" + currFormula;
+          values[row][col] = sheet.getRange(startRow + row, startCol + col).getValue();
+          formulas[row][col] = ""; // clear from sheet
         } else {
-          //there is a formula but we want to preserve it
-
-          // formulas[row][col] = formulas[row][col]; no-op but systematically makes sense to preserve formula
+          // Case 2: Non-AI formula → keep it
+          backupFormulasAsText[row][col] = "";
+          // formulas[row][col] already has the correct value — no need to touch
+          // values[row][col] already has original value
         }
-      } else {
-        //there is a hardcoded value here with no formula
-
-        formulas[row][col] = ""; //make sure that no formula gets saved
-
-        // values[row][col] = values[row][col]; no-op but systematically makes sense to preserve value
+    } else {
+      // Case 3: Static value (no formula)
+      backupFormulasAsText[row][col] = "";
+      // Don't touch formulas[row][col] — it's already "" and should stay
+      // Don't touch values[row][col] — it already has the static value
       }
     }
-  }
+  } 
   if(modified){
     // Reapply non-LLM formulas, remove LLM formulas
     range.setValues(values); //set values first so then we can do google sheets formulas on top to preserve
-    range.setFormulas(formulas);
+    // range.setFormulas(formulas);
     backupSheet.getRange(startRow, startCol, numRows, numCols).setValues(backupFormulasAsText);
   } else {
-    SpreadsheetApp.getUi().alert("No AI_CALL or AI_CALL_ADV formulas found in selected range.");
+    SpreadsheetApp.getUi().alert("No custom formulas found to replace in current sheet.");
   }
 }
 
@@ -321,6 +321,6 @@ function values_to_formulas(sheet, range){
     range.setFormulas(formulas) //set formulas to include custom functions
     backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
   } else {
-    SpreadsheetApp.getUi().alert("No custom formulas found to replace in current sheet.");
+    SpreadsheetApp.getUi().alert("No custom values found to replace in current sheet.");
   }
 }

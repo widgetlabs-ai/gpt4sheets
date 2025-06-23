@@ -222,28 +222,28 @@ function formulas_to_values(sheet, range){
         if (set_functions.has(formulaPrefix)) {
           // Case 1: AI formula
           modified = true;
+          const cell = sheet.getRange(startRow + row, startCol + col);
+          cell.setValue(values[row][col])
           backupFormulasAsText[row][col] = "'" + currFormula;
-          values[row][col] = sheet.getRange(startRow + row, startCol + col).getValue();
-          formulas[row][col] = ""; // clear from sheet
         } else {
           // Case 2: Non-AI formula → keep it
-          backupFormulasAsText[row][col] = "";
+          backupFormulasAsText[row][col] = null;
           // formulas[row][col] already has the correct value — no need to touch
           // values[row][col] already has original value
         }
     } else {
       // Case 3: Static value (no formula)
-      backupFormulasAsText[row][col] = "";
+      backupFormulasAsText[row][col] = null;
       // Don't touch formulas[row][col] — it's already "" and should stay
       // Don't touch values[row][col] — it already has the static value
       }
     }
   } 
+
   if(modified){
-    // Reapply non-LLM formulas, remove LLM formulas
-    range.setValues(values); //set values first so then we can do google sheets formulas on top to preserve
-    // range.setFormulas(formulas);
+    // Apply LLM formulas to backup sheet
     backupSheet.getRange(startRow, startCol, numRows, numCols).setValues(backupFormulasAsText);
+    SpreadsheetApp.getUi().alert("All custom formulas have been replaced by their values");
   } else {
     SpreadsheetApp.getUi().alert("No custom formulas found to replace in current sheet.");
   }

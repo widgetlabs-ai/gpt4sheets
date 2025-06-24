@@ -307,8 +307,9 @@ function values_to_formulas(sheet, range){
       if(currBackup && currBackup !== ""){
         //there exists a backupFormula we want to replace
         to_replace = true;
-        const currFormula = currBackup.substring(1);
-        formulas[row][col] = currFormula; //set the formulas in the corresponding cell of the main sheet to the backup formula
+        let currFormula = currBackup.substring(1);
+        const cell = sheet.getRange(startRow + row, startCol + col);
+        cell.setFormula(currFormula);
         backupFormulas[row][col] = ""; //no need to save the formula anymore
       } else {
         //there is no backup formula and there is nothing to do
@@ -318,9 +319,9 @@ function values_to_formulas(sheet, range){
     }
   }
   if(to_replace){
-    range.setFormulas(formulas) //set formulas to include custom functions
     backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
+    SpreadsheetApp.getUi().alert("All values from custom formulas have been replaced");
   } else {
-    SpreadsheetApp.getUi().alert("No custom values found to replace in current sheet.");
+    SpreadsheetApp.getUi().alert("No dynamic values found to replace in current sheet.");
   }
 }

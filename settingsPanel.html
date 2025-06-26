@@ -321,24 +321,12 @@
       text-align: right;
     }
 
-    .utility-button-group {
-      margin-bottom: 16px;
+    .replace-go-button{
+      margin-top: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-
-    .utility-button-group button {
-      width: 100%;
-      max-width: 100%;
-      padding: 10px 14px;
-    }
-
-    .utility-description {
-      font-size: 12px;
-      color: #6b4423;
-      margin-top: 6px;
-      line-height: 1.4;
-      padding-left: 2px;
-    }
-
   </style>
 </head>
 
@@ -562,33 +550,17 @@
   <div class="content" id="content-utilities">
     <div class="utilities-content">
       <h3>Available Functions</h3>
-
-      <div class="utility-button-group">
-        <button onclick="google.script.run.replace_selected_formulas_with_values()">
-          Replace Select Formulas With Values
-        </button>
-        <div class="utility-description">Converts formulas to static values in the selected range only.</div>
-      </div>
-
-      <div class="utility-button-group">
-        <button onclick="google.script.run.replace_all_formulas_with_values()">
-          Replace All Formulas With Values
-        </button>
-        <div class="utility-description">Replaces all formulas in the sheet with their current values.</div>
-      </div>
-
-      <div class="utility-button-group">
-        <button onclick="google.script.run.replace_selected_values_with_formulas()">
-          Replace Select Values With Formulas
-        </button>
-        <div class="utility-description">Restores backed-up formulas in the selected cells.</div>
-      </div>
-
-      <div class="utility-button-group">
-        <button onclick="google.script.run.replace_all_values_with_formulas()">
-          Replace All Values With Formulas
-        </button>
-        <div class="utility-description">Restores all formulas in the sheet from the backup.</div>
+        <div class="utility-dropdown-group">
+          <select id="utility-action">
+            <option selected disabled value="-1">Choose an action...</option>
+            <option value="1">Replace Select Formulas → Values</option>
+            <option value="2">Replace All Formulas → Values</option>
+            <option value="3">Replace Select Values → Formulas</option>
+            <option value="4">Replace All Values → Formulas</option>
+          </select>
+          <div class="replace-go-button">
+            <button onclick="run_selected_option()">Go</button>
+          </div>
       </div>
     </div>
   </div>
@@ -615,6 +587,27 @@
       loadSettings();
       checkForUpdateDisplay();
     };
+
+  function run_selected_option() {
+    const option = document.getElementById("utility-action").value;
+
+    switch (option) {
+      case "1":
+        google.script.run.replace_selected_formulas_with_values();
+        break;
+      case "2":
+        google.script.run.replace_all_formulas_with_values();
+        break;
+      case "3":
+        google.script.run.replace_selected_values_with_formulas();
+        break;
+      case "4":
+        google.script.run.replace_all_values_with_formulas();
+        break;
+      default:
+        alert("Please choose an action.");
+    }
+  }
     
     function checkForUpdateDisplay() {
       google.script.run

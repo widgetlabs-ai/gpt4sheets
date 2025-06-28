@@ -26,7 +26,7 @@ function getAllModelsGrouped() {
  * This constant will be automatically updated by the sync script
  * @type {string}
  */
-const CURRENT_COMMIT_SHA = "3edffcaae5f316bd75fa13843408ec6a28591592";
+const CURRENT_COMMIT_SHA = "4f62095ed916f0f8ad227be4aa565918fdac5b65";
 
 /**
  * Checks if the current version is outdated by comparing the embedded commit SHA

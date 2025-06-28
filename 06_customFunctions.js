@@ -154,3 +154,174 @@ function AI_CALL_ADV(prompt, systemPrompt = "You are a helpful assistant", input
     return "Error: " + error.message;
   }
 }
+
+
+/**
+ * Base function for formulas -> values for selected range
+ */
+function replace_selected_formulas_with_values(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getActiveRange();
+  formulas_to_values(sheet, range)
+}
+
+/**
+ * Base function for formulas -> values for all range
+ */
+function replace_all_formulas_with_values(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getDataRange();
+  formulas_to_values(sheet, range)
+}
+
+
+/**
+ * Templated formula -> value function for easier code readability
+ * 
+ * @param {SpreadsheetApp->spreadsheet->sheet} sheet --> the currenr sheet we are operating on 
+ * @param {sheet->range} range --> the MSM (minimum spanning matrix of the selected data values [custom/all])
+ * @returns 
+ */
+function formulas_to_values(sheet, range){
+  //warning so that you dont run it on itself  
+  if (sheet.getName().endsWith("_BCKFM")) {
+    SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
+    return;
+  }
+
+  //Get backup sheet
+  const backupSheet = getBackupSheet(sheet);
+
+  //Get metadata on the range
+  const numRows = range.getNumRows();
+  const numCols = range.getNumColumns();
+  const startRow = range.getRow();
+  const startCol = range.getColumn();
+
+  //Get values 
+  let values = range.getValues(); 
+
+  //get formulas and a deep copy of formulas to save
+  let formulas = range.getFormulas();
+  let backupFormulasAsText = formulas.map(row => [...row]); // deep copy of formulas to modify
+
+  //boolean to see if range has formulas to replace
+  let modified = false;
+
+  //get set of sheet functions
+  const set_functions = getSheetFunctions();
+
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
+      const currFormula = formulas[row][col];
+
+      if (currFormula) {
+        let formulaPrefix = currFormula.split('(')[0].trim().toUpperCase();
+        formulaPrefix = formulaPrefix.substring(1); // remove '='
+
+        if (set_functions.has(formulaPrefix)) {
+          // Case 1: AI formula
+          modified = true;
+          const cell = sheet.getRange(startRow + row, startCol + col);
+          cell.setValue(values[row][col])
+          backupFormulasAsText[row][col] = "'" + currFormula;
+        } else {
+          // Case 2: Non-AI formula → keep it
+          backupFormulasAsText[row][col] = null;
+          // formulas[row][col] already has the correct value — no need to touch
+          // values[row][col] already has original value
+        }
+    } else {
+      // Case 3: Static value (no formula)
+      backupFormulasAsText[row][col] = null;
+      // Don't touch formulas[row][col] — it's already "" and should stay
+      // Don't touch values[row][col] — it already has the static value
+      }
+    }
+  } 
+
+  if(modified){
+    // Apply LLM formulas to backup sheet
+    backupSheet.getRange(startRow, startCol, numRows, numCols).setValues(backupFormulasAsText);
+    SpreadsheetApp.getUi().alert("All custom formulas have been replaced by their values");
+  } else {
+    SpreadsheetApp.getUi().alert("No custom formulas found to replace in current sheet.");
+  }
+}
+
+/**
+ * Base function for values -> formulas for selected range
+ */
+function replace_selected_values_with_formulas(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getActiveRange();
+  values_to_formulas(sheet, range);
+}
+
+/**
+ * Base function for values -> formulas for entire range
+ */
+function replace_all_values_with_formulas(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const range = sheet.getDataRange();
+  values_to_formulas(sheet, range);
+  const sheetName = "" + sheet.getSheetId() + "_BCKFM";
+  const backupSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  SpreadsheetApp.getActiveSpreadsheet().deleteSheet(backupSheet);
+}
+
+
+/**
+ * 
+ * @param {SpreadsheetApp->spreadsheet->sheet} sheet --> the current sheet we are operating on 
+ * @param {sheet->range} range --> the range of the sheet we are operating on
+ * @returns 
+ */
+function values_to_formulas(sheet, range){
+  //warning so that you dont run it on itself  
+  if (sheet.getName().endsWith("_BCKFM")) {
+    SpreadsheetApp.getUi().alert("Do not run this on the backup sheet.");
+    return;
+  }
+
+  //get values on current sheet
+  let values = range.getValues();
+
+  //get formulas on current sheet
+  let formulas = range.getFormulas();
+
+  //get metadata on range
+  const numRows = range.getNumRows();
+  const numCols = range.getNumColumns();
+  const startRow = range.getRow();
+  const startCol = range.getColumn();
+
+  //get backup sheet and its formulas
+  const backupSheet = getBackupSheet(sheet);
+  let backupFormulas = backupSheet.getRange(startRow, startCol, numRows, numCols).getValues();
+
+  let to_replace = false;
+  for(let row = 0; row<numRows; row++){
+    for(let col = 0; col<numCols; col++){
+      const currBackup = backupFormulas[row][col];
+      if(currBackup && currBackup !== ""){
+        //there exists a backupFormula we want to replace
+        to_replace = true;
+        let currFormula = currBackup.substring(1);
+        const cell = sheet.getRange(startRow + row, startCol + col);
+        cell.setFormula(currFormula);
+        backupFormulas[row][col] = ""; //no need to save the formula anymore
+      } else {
+        //there is no backup formula and there is nothing to do
+
+        //values[row][col] = values[row][col] <-- this is a no op but it is implied that the values stay the same
+      }
+    }
+  }
+  if(to_replace){
+    backupSheet.getRange(startRow, startCol, numRows, numCols).setFormulas(backupFormulas); //overwrite the backup formulas so they dont exist anymore
+    SpreadsheetApp.getUi().alert("All values from custom formulas have been replaced");
+  } else {
+    SpreadsheetApp.getUi().alert("No dynamic values found to replace in current sheet.");
+  }
+}

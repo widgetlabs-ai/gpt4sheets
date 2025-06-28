@@ -55,6 +55,14 @@ Advanced AI function with full control over parameters.
 =AI_CALL_ADV("Create a 3x3 table", "", "", 0, "", "matrix", true)
 ```
 
+### Replace Formulas With Values
+Save LLM token usage by using the Replace Formulas With Values button in the sidebar. Converts dynamic values to static in a selected range of cells or for an entire sheet.
+
+### Replace Values With Formulas
+Restore static cells with the parent custom function. Converts static values back to theri dynamic counterpart in a selected range of cells or for an entire sheet
+
+
+
 ## Included Models (Default)
 The following models are pre-configured for use with `AI_CALL()` and for ease of use, have been kept limited to the fast flagship models, and one latest model, from the top LLM providers. Advanced users may access any additional models from these providers, with no code changes needed, by using the `AI_CALL_ADV()` function. The WidgetLabs team will keep the default models list updated on a monthly basis.  
 

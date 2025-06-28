@@ -320,6 +320,13 @@
       margin-top: 4px;
       text-align: right;
     }
+
+    .replace-go-button{
+      margin-top: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   </style>
 </head>
 
@@ -334,6 +341,7 @@
     <div class="tab active" id="tab-api-keys">API Keys</div>
     <div class="tab" id="tab-preferences">Preferences</div>
     <div class="tab" id="tab-help">Help</div>
+    <div class="tab" id="tab-utilities">Utilities</div>
   </div>
 
   <!-- API Keys Tab -->
@@ -537,6 +545,26 @@
     </div>
   </div>
 
+
+  <!-- Utilities Tab -->
+  <div class="content" id="content-utilities">
+    <div class="utilities-content">
+      <h3>Available Functions</h3>
+        <div class="utility-dropdown-group">
+          <select id="utility-action">
+            <option selected disabled value="-1">Choose an action...</option>
+            <option value="1">Replace Select Formulas → Values</option>
+            <option value="2">Replace All Formulas → Values</option>
+            <option value="3">Replace Select Values → Formulas</option>
+            <option value="4">Replace All Values → Formulas</option>
+          </select>
+          <div class="replace-go-button">
+            <button onclick="run_selected_option()">Go</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Tab switching
     document.querySelectorAll('.tab').forEach(tab => {
@@ -559,6 +587,27 @@
       loadSettings();
       checkForUpdateDisplay();
     };
+
+  function run_selected_option() {
+    const option = document.getElementById("utility-action").value;
+
+    switch (option) {
+      case "1":
+        google.script.run.replace_selected_formulas_with_values();
+        break;
+      case "2":
+        google.script.run.replace_all_formulas_with_values();
+        break;
+      case "3":
+        google.script.run.replace_selected_values_with_formulas();
+        break;
+      case "4":
+        google.script.run.replace_all_values_with_formulas();
+        break;
+      default:
+        alert("Please choose an action.");
+    }
+  }
     
     function checkForUpdateDisplay() {
       google.script.run

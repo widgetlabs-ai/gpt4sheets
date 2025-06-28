@@ -171,3 +171,22 @@ function safeToString(value) {
   }
   return value.toString();
 }
+
+
+/** 
+* Helper to ensure backupsheet is made and exists
+* @param {SpreadsheetApp->spreadsheet->sheet} the current sheet we want to make a backup copy for
+
+* @returns {SpreadsheetApp->spreadsheet->sheet} the backup sheet we want to access
+*/
+function getBackupSheet(sheet){
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetID = sheet.getSheetId();
+  const backupSheetName = "" + sheetID + "_BCKFM";
+  let backupSheet = spreadsheet.getSheetByName(backupSheetName);
+  if(!backupSheet){
+    backupSheet = spreadsheet.insertSheet(backupSheetName);
+    backupSheet.hideSheet();
+  }
+  return backupSheet;
+}

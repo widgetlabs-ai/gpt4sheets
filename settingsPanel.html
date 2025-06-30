@@ -572,7 +572,7 @@
           </div>
       </div>
       <div class="text-to-cell-div">
-        <button onclick="listTxtFiles()">🔍 Find .txt Files in Drive</button>
+        <button onclick="listTxtFilesHelper()">🔍 Find .txt Files in Drive</button>
         <select id="fileSelect"></select>
         <button onclick="insertTxtContent()">📄 Output File Text to Cell</button>
       </div>
@@ -602,7 +602,26 @@
       checkForUpdateDisplay();
     };
 
-    
+    function listTxtFilesHelper(){
+      google.script.run.withSuccessHandler(populateFileSelect).listTxtFiles();
+    }
+
+    function populateFileSelect(files){
+      const select = document.getElementById("fileSelect");
+      select.innerHTML = "";
+
+      const baseOption = document.createElement("option");
+      baseOption.value = -1;
+      baseOption.text = "-- Select a txt file --";
+      select.add(baseOption);
+
+      for(const file of files){
+        const option = document.createElement("option");
+        option.value = file.id;
+        option.text = file.name;
+        select.add(option);
+      }
+    }
 
     function run_selected_option() {
       const option = document.getElementById("utility-action").value;

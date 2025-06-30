@@ -327,6 +327,17 @@
       justify-content: center;
       align-items: center;
     }
+
+  .text-to-cell-div {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    background: lightgray; 
+    height: 50px; 
+  }
+
   </style>
 </head>
 
@@ -561,6 +572,10 @@
           <div class="replace-go-button">
             <button onclick="run_selected_option()">Go</button>
           </div>
+      </div>
+      <div class="text-to-cell-div">
+        <input type="file" id="txt_entry" accept=".txt">
+        <button id="text-cell-button">Output Text to Cell</button>
       </div>
     </div>
   </div>

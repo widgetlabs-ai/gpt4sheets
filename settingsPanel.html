@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
   <style>
     html, body {
       font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
@@ -334,6 +333,7 @@
       justify-content: center;
       align-items: center;
       margin-top: 20px;
+      flex-direction: column;
     }
 
   </style>
@@ -572,7 +572,9 @@
           </div>
       </div>
       <div class="text-to-cell-div">
-        <button id="text-cell-button">Output .txt File to Cell</button>
+        <button onclick="listTxtFiles()">🔍 Find .txt Files in Drive</button>
+        <select id="fileSelect"></select>
+        <button onclick="insertTxtContent()">📄 Output File Text to Cell</button>
       </div>
     </div>
   </div>
@@ -600,26 +602,28 @@
       checkForUpdateDisplay();
     };
 
-  function run_selected_option() {
-    const option = document.getElementById("utility-action").value;
+    
 
-    switch (option) {
-      case "1":
-        google.script.run.replace_selected_formulas_with_values();
-        break;
-      case "2":
-        google.script.run.replace_all_formulas_with_values();
-        break;
-      case "3":
-        google.script.run.replace_selected_values_with_formulas();
-        break;
-      case "4":
-        google.script.run.replace_all_values_with_formulas();
-        break;
-      default:
-        alert("Please choose an action.");
+    function run_selected_option() {
+      const option = document.getElementById("utility-action").value;
+
+      switch (option) {
+        case "1":
+          google.script.run.replace_selected_formulas_with_values();
+          break;
+        case "2":
+          google.script.run.replace_all_formulas_with_values();
+          break;
+        case "3":
+          google.script.run.replace_selected_values_with_formulas();
+          break;
+        case "4":
+          google.script.run.replace_all_values_with_formulas();
+          break;
+        default:
+          alert("Please choose an action.");
+      }
     }
-  }
     
     function checkForUpdateDisplay() {
       google.script.run

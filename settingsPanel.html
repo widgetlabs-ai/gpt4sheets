@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
   <style>
     html, body {
       font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
@@ -328,15 +329,12 @@
       align-items: center;
     }
 
-  .text-to-cell-div {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-    background: lightgray; 
-    height: 50px; 
-  }
+    .text-to-cell-div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
 
   </style>
 </head>
@@ -574,8 +572,7 @@
           </div>
       </div>
       <div class="text-to-cell-div">
-        <input type="file" id="txt_entry" accept=".txt">
-        <button id="text-cell-button">Output Text to Cell</button>
+        <button id="text-cell-button">Output .txt File to Cell</button>
       </div>
     </div>
   </div>

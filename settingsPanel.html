@@ -653,6 +653,7 @@
     function insertTxtContent(){
       let txtID = document.getElementById("fileSelect").value;
       google.script.run.file_to_cell(txtID);
+      document.getElementById("fileSelect").value = -1;
     }
 
     function run_selected_option() {

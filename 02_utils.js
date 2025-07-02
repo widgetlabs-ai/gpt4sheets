@@ -190,3 +190,22 @@ function getBackupSheet(sheet){
   }
   return backupSheet;
 }
+
+
+/**
+ * Helper function to get the txt file names and IDs in one persons drive
+ * 
+ * @returns an array that has both txt file names and ID
+ */
+function listTxtFiles(){
+  const files = DriveApp.getFilesByType(MimeType.PLAIN_TEXT);
+  const result = [];
+  while(files.hasNext()){
+    const file = files.next();
+    result.push({
+      name: file.getName(),
+      id: file.getId()
+    });
+  }
+  return result;
+}

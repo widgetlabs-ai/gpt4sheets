@@ -326,7 +326,11 @@ function values_to_formulas(sheet, range){
   }
 }
 
-
+/**
+ * 
+ * @param {string} txtID --> The Drive ID of the .txt file to extract 
+ * @returns {void} --> Doesn't return anything, but sets the value of the current cell to the text of the .txt file
+ */
 function file_to_cell(txtID){
   if(txtID === '-1' || txtID === null){
     SpreadsheetApp.getUI().alert("Please choose a .txt file to extract.");

@@ -628,11 +628,13 @@
       loadSettings();
       checkForUpdateDisplay();
     };
-
+    
+    //calls the backend to grab the .txt files and forwards that to populateFileSelect
     function listTxtFilesHelper(){
       google.script.run.withSuccessHandler(populateFileSelect).listTxtFiles();
     }
 
+    //need access to the DOM, so populate file select is client side
     function populateFileSelect(files){
       const select = document.getElementById("fileSelect");
       select.innerHTML = "";
@@ -650,6 +652,7 @@
       }
     }
 
+    // call the server side function to output in a cell
     function insertTxtContent(){
       let txtID = document.getElementById("fileSelect").value;
       google.script.run.file_to_cell(txtID);

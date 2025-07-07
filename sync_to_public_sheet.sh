@@ -6,16 +6,36 @@
 PUBLIC_SCRIPT_ID="1CbblD1Mu2ImtTXLtHjRydPlrA6ZULVmC_qDE8A3O488XsnDCqWWrUfyh"
 
 # Verify .clasp.json has the correct script ID
-echo "Verifying .clasp.json points to the public sheet..."
+echo "Checking .clasp.json configuration..."
 CURRENT_SCRIPT_ID=$(grep -o '"scriptId":"[^"]*"' .clasp.json | cut -d'"' -f4)
+CURRENT_ROOT_DIR=$(grep -o '"rootDir":"[^"]*"' .clasp.json | cut -d'"' -f4)
 
 if [ "$CURRENT_SCRIPT_ID" != "$PUBLIC_SCRIPT_ID" ]; then
-  echo "ERROR: .clasp.json contains incorrect script ID!"
-  echo "Current ID: $CURRENT_SCRIPT_ID"
-  echo "Expected ID: $PUBLIC_SCRIPT_ID"
-  echo "Please update .clasp.json or use the following command:"
-  echo "echo '{\"scriptId\":\"$PUBLIC_SCRIPT_ID\",\"rootDir\":\"$(pwd)\"}' > .clasp.json"
-  exit 1
+  echo "Current script ID ($CURRENT_SCRIPT_ID) is not the public sheet ID."
+  echo "This appears to be your development environment."
+  echo ""
+  echo "This script will:"
+  echo "  • Temporarily update .clasp.json to point to the public sheet"
+  echo "  • Push your code to the public sheet"
+  echo "  • Restore your development environment afterward"
+  echo ""
+  read -p "Type 'yes' to proceed or anything else to exit: " CONFIRM
+  
+  if [ "$CONFIRM" != "yes" ]; then
+    echo "Operation cancelled. Exiting."
+    exit 1
+  fi
+  
+  echo "Creating backup of your current .clasp.json..."
+  cp .clasp.json .clasp.json.bak
+  
+  echo "Temporarily updating .clasp.json to point to public sheet..."
+  echo "{\"scriptId\":\"$PUBLIC_SCRIPT_ID\",\"rootDir\":\"$CURRENT_ROOT_DIR\"}" > .clasp.json
+  
+  # Set flag to restore .clasp.json later
+  RESTORE_CLASP_JSON=true
+else
+  RESTORE_CLASP_JSON=false
 fi
 
 # Get the latest commit SHA from the main branch
@@ -35,5 +55,12 @@ clasp push -f
 git add 05_settingsManager.js
 git commit -m "Update current commit SHA to $LATEST_COMMIT"
 git push origin main
+
+# Restore original .clasp.json if we modified it
+if [ "$RESTORE_CLASP_JSON" = true ]; then
+  echo "Restoring your development .clasp.json configuration..."
+  mv .clasp.json.bak .clasp.json
+  echo "Development environment restored."
+fi
 
 echo "Sync completed successfully!"

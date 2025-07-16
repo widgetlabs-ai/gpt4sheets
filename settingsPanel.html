@@ -327,6 +327,25 @@
       justify-content: center;
       align-items: center;
     }
+
+    .text-to-cell-div {
+      margin-top: 40px;
+    }
+
+    .find-txt-button{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .outputTxtButton{
+      margin-top: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
   </style>
 </head>
 
@@ -503,7 +522,6 @@
   <div class="content" id="content-help">
     <div class="help-content">
       <h3>Available Functions</h3>
-      
       <h4>=AI_CALL(prompt, [inputText])</h4>
       <p>Simple AI function that uses your default model and settings.</p>
       <ul>
@@ -546,10 +564,15 @@
   </div>
 
 
+
   <!-- Utilities Tab -->
   <div class="content" id="content-utilities">
     <div class="utilities-content">
-      <h3>Available Functions</h3>
+      <h3 class="section-title">Available Functions</h3>
+
+      <div class="section">
+        <div class="section-title">Formula ↔ Value Replacement</div>
+        <p class="section-description">Replace formulas with values or vice versa, either for selected cells or the whole sheet.</p>
         <div class="utility-dropdown-group">
           <select id="utility-action">
             <option selected disabled value="-1">Choose an action...</option>
@@ -561,9 +584,29 @@
           <div class="replace-go-button">
             <button onclick="run_selected_option()">Go</button>
           </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Text File → Cell Output</div>
+        <p class="section-description">Search Drive for .txt files and insert their content directly into your spreadsheet.</p>
+        <br>
+        <p class="section-description">NOTE: Only .txt files in the root/main folder of Google Drive will show up.</p>
+        <div class="text-to-cell-div">
+          <div class="find-txt-button">
+            <button onclick="listTxtFilesHelper()">🔍 Find .txt Files in Drive</button>
+          </div>
+          <div class="select-txt">
+            <select id="fileSelect"></select>
+          </div>
+          <div class="outputTxtButton">
+            <button onclick="insertTxtContent()">📄 Output File Text to Cell</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
 
   <script>
     // Tab switching
@@ -587,27 +630,57 @@
       loadSettings();
       checkForUpdateDisplay();
     };
-
-  function run_selected_option() {
-    const option = document.getElementById("utility-action").value;
-
-    switch (option) {
-      case "1":
-        google.script.run.replace_selected_formulas_with_values();
-        break;
-      case "2":
-        google.script.run.replace_all_formulas_with_values();
-        break;
-      case "3":
-        google.script.run.replace_selected_values_with_formulas();
-        break;
-      case "4":
-        google.script.run.replace_all_values_with_formulas();
-        break;
-      default:
-        alert("Please choose an action.");
+    
+    //calls the backend to grab the .txt files and forwards that to populateFileSelect
+    function listTxtFilesHelper(){
+      google.script.run.withSuccessHandler(populateFileSelect).listTxtFiles();
     }
-  }
+
+    //need access to the DOM, so populate file select is client side
+    function populateFileSelect(files){
+      const select = document.getElementById("fileSelect");
+      select.innerHTML = "";
+
+      const baseOption = document.createElement("option");
+      baseOption.value = -1;
+      baseOption.text = "-- Select a txt file --";
+      select.add(baseOption);
+
+      for(const file of files){
+        const option = document.createElement("option");
+        option.value = file.id;
+        option.text = file.name;
+        select.add(option);
+      }
+    }
+
+    // call the server side function to output in a cell
+    function insertTxtContent(){
+      let txtID = document.getElementById("fileSelect").value;
+      google.script.run.file_to_cell(txtID);
+      document.getElementById("fileSelect").value = -1;
+    }
+
+    function run_selected_option() {
+      const option = document.getElementById("utility-action").value;
+
+      switch (option) {
+        case "1":
+          google.script.run.replace_selected_formulas_with_values();
+          break;
+        case "2":
+          google.script.run.replace_all_formulas_with_values();
+          break;
+        case "3":
+          google.script.run.replace_selected_values_with_formulas();
+          break;
+        case "4":
+          google.script.run.replace_all_values_with_formulas();
+          break;
+        default:
+          alert("Please choose an action.");
+      }
+    }
     
     function checkForUpdateDisplay() {
       google.script.run

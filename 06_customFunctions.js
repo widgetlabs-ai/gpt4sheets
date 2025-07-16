@@ -325,3 +325,52 @@ function values_to_formulas(sheet, range){
     SpreadsheetApp.getUi().alert("No dynamic values found to replace in current sheet.");
   }
 }
+
+/**
+ * Imports content from a text file in Google Drive into the current cell
+ * 
+ * @param {string} txtID - The Drive ID of the .txt file to extract 
+ * @returns {void} - Doesn't return anything, but sets the value of the current cell to the text of the .txt file
+ */
+function file_to_cell(txtID){
+  // Check for valid input
+  if(txtID === '-1' || txtID === null || txtID === undefined){
+    SpreadsheetApp.getUi().alert("Please choose a .txt file to extract.");
+    return;
+  }
+
+  // Get active sheet and cell
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const cell = sheet.getCurrentCell();
+
+  if(cell === null){
+    SpreadsheetApp.getUi().alert("Choose a cell for the output.");
+    return;
+  }
+
+  try {
+    // Get the file from Drive
+    const file = DriveApp.getFileById(txtID);
+    
+    // Check file size (limit to 50MB to be safe)
+    const fileSize = file.getSize();
+    const MAX_SIZE = 50 * 1024 * 1024; // 50MB in bytes
+    
+    if (fileSize > MAX_SIZE) {
+      SpreadsheetApp.getUi().alert("File is too large to import. Please select a smaller text file (under 50MB).");
+      return;
+    }
+    
+    // Get file content
+    const fileBody = file.getBlob();
+    const data = fileBody.getDataAsString();
+    
+    // Insert into cell
+    cell.setValue(data);
+    SpreadsheetApp.getUi().alert("Extracted text from '" + file.getName() + "' successfully");
+  } catch (error) {
+    // Handle potential errors
+    console.error("Error in file_to_cell:", error);
+    SpreadsheetApp.getUi().alert("Error importing text file: " + error.toString());
+  }
+}

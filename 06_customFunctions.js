@@ -326,27 +326,6 @@ function values_to_formulas(sheet, range){
   }
 }
 
-
-/**
- * Helper function to get the txt file names and IDs in one persons drive
- * 
- * @returns an array that has both txt file names and ID
- */
-function listTxtFiles(){
-  const folder = DriveApp.getRootFolder();
-  const files = folder.getFilesByType(MimeType.PLAIN_TEXT);
-  const result = [];
-  while(files.hasNext()){
-    const file = files.next();
-    result.push({
-      name: file.getName(),
-      id: file.getId()
-    });
-  }
-  return result;
-}
-
-
 /**
  * Imports content from a text file in Google Drive into the current cell
  * 

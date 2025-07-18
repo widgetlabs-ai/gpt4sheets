@@ -593,11 +593,10 @@
         <br>
         <p class="section-description">NOTE: Only .txt files in the root/main folder of Google Drive will show up.</p>
         <div class="text-to-cell-div">
-          <div class="find-txt-button">
-            <button onclick="listTxtFilesHelper()">🔍 Find .txt Files in Drive</button>
-          </div>
           <div class="select-txt">
-            <select id="fileSelect"></select>
+            <select onclick="listTxtFilesHelper()" id="fileSelect">
+              <option>-- Click to load file(s) --</option>
+            </select>
           </div>
           <div class="outputTxtButton">
             <button onclick="insertTxtContent()">📄 Output File Text to Cell</button>

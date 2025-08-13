@@ -374,3 +374,27 @@ function file_to_cell(txtID){
     SpreadsheetApp.getUi().alert("Error importing text file: " + error.toString());
   }
 }
+
+/**
+ * 
+ * @param {string} cell 
+ * @param {string} promptString 
+ * @returns {string} 
+ * 
+ * @customfunction 
+ * 
+ * @example =AI_EXTRACT(A1, "Extract the main idea")
+ */
+function AI_EXTRACT(cell, promptString){
+  //Validate Input
+  //Cell gets evaluated before getting passed in --> it will act as a string
+  if(!cell) return "Error: Please pick a non-null cell.";
+  if(!promptString) return "Error: Please provide a prompt string.";
+
+  const prompt = "Prompt: " + promptString + "\nPlease return the answer only in the minimal words.";
+
+  const response = AI_CALL(prompt, cell);
+
+  return response;
+
+}

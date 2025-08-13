@@ -386,15 +386,51 @@ function file_to_cell(txtID){
  * @example =AI_EXTRACT(A1, "Extract the main idea")
  */
 function AI_EXTRACT(cell, promptString){
-  //Validate Input
-  //Cell gets evaluated before getting passed in --> it will act as a string
-  if(!cell) return "Error: Please pick a non-null cell.";
-  if(!promptString) return "Error: Please provide a prompt string.";
+  try{
+    if(!cell) return "Error: Please pick a non-null cell.";
+    if(!promptString) return "Error: Please provide a prompt string.";
 
-  const prompt = "Prompt: " + promptString + "\nPlease return the answer only in the minimal words.";
+    const prompt = "Prompt: " + promptString + "\nPlease return the answer only in the minimal words.";
 
-  const response = AI_CALL(prompt, cell);
+    const response = AI_CALL(prompt, cell);
 
-  return response;
+    return response;
+  } catch (error){
+    return "Error: " + error.message;
+  }
+}
 
+
+/**
+ * AI Classifer Function that accepts any combination of string or cells as the input
+ *
+ * @param {string/2D Array} classifiers
+ * @param {string} object
+ * @returns {string}
+ *
+ * @customfunction
+ * 
+ * @example 
+ * =AI_CLASSIFY(A1:A3, B1)
+ * =AI_CLASSIFY("Is this a fruit, vegetable, or neither?", "Rock")
+ */
+function AI_CLASSIFY(classifiers, object){
+  try {
+    if(!object) return "Error: Please provide an object to classify.";
+    if(!classifiers) return "Error: Please provide classifiers."; 
+
+    const base_prompt = "Classify the following object using these criteria: ";
+
+    if(typeof(classifiers) === "string"){
+      const prompt = base_prompt + classifiers + "Output is strictly one of the classes";
+      return AI_CALL(prompt, object);
+    } else {
+      //classifiers is a 2D array that needs to be turned to a string
+      const flattened = classifiers.flat().join(',');
+      const prompt = base_prompt + flattened + "Output is strictly one of the classes";
+      return AI_CALL(prompt, object);
+    }
+  } catch (error) {
+    return "Error: " + error.message;
+  }
 }

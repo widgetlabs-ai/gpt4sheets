@@ -392,9 +392,7 @@ function AI_EXTRACT(cell, promptString){
 
     const prompt = "Prompt: " + promptString + "\nPlease return the answer only in the minimal words.";
 
-    const response = AI_CALL(prompt, cell);
-
-    return response;
+    return AI_CALL(prompt, cell);
   } catch (error){
     return "Error: " + error.message;
   }
@@ -430,6 +428,34 @@ function AI_CLASSIFY(classifiers, object){
       const prompt = base_prompt + flattened + "Output is strictly one of the classes";
       return AI_CALL(prompt, object);
     }
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+/**
+ * 
+ * Accepts any combination of string or cells as the input
+ * 
+ * @param {cell} text 
+ * @param {user string} outputLanguage 
+ * 
+ * @customfunction
+ * 
+ * @example
+ * =AI_TRANSLATE(A1, "Spanish")
+ * =AI_TRANSLATE("Hello, world!", "French")
+ * 
+ */
+
+function AI_TRANSLATE(text, outputLanguage){
+  try{
+    if(!text) return "Error: Please provide text to translate.";
+    if(!outputLanguage) return "Error: Please provide an output language.";
+
+    const prompt = "Translate the follwing text into " + outputLanguage + ". Return the text only";
+    return AI_CALL(prompt, text);
+
   } catch (error) {
     return "Error: " + error.message;
   }

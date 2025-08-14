@@ -460,3 +460,35 @@ function AI_TRANSLATE(text, outputLanguage){
     return "Error: " + error.message;
   }
 }
+
+
+/**
+ * 
+ * AI Summarization with custom output length as # of sentences
+ * Works on any combination of strings or cells as input
+ * 
+ * Default sentence size is medium
+ * 
+ * @param {string} text 
+ * @param {int} num_sentences 
+ * @param {string} sentence_length 
+ * 
+ * @customfunction
+ * 
+ * @example
+ * =AI_SUMMARIZE(A1, 3, "short")
+ *
+ * 
+ */
+function AI_SUMMARIZE(text, num_sentences, sentence_length){
+  try{
+    if(!text) return "Error: Please provide text to summarize.";
+    if(!num_sentences || num_sentences <= 0) return "Error: Please provide a valid output length.";
+    if(!sentence_length) sentence_length = "medium";
+
+    const prompt = "Summarize the following text in " + num_sentences + " " + sentence_length + " sentences. Return only the summary.";
+    return AI_CALL(prompt, text);
+  } catch (error){
+    return "Error: " + error.message;
+  }
+}

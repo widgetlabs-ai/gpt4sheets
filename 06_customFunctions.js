@@ -492,3 +492,34 @@ function AI_SUMMARIZE(text, num_sentences, sentence_length){
     return "Error: " + error.message;
   }
 }
+
+
+
+/**
+ * AI Formatting Function that takes in both cells and strings as inputs
+ * 
+ * 
+ * @param {string} formatStyle 
+ * @param {string} text
+ * 
+ * 
+ * @customfunction
+ * 
+ * @example
+ * =AI_FORMAT("MM/DD/YYYY", A1)
+ * =AI_FORMAT("snake case", "Hello World!")
+ *  
+ */
+function AI_FORMAT(formatStyle, text){
+  try {
+    if(!formatStyle) return "Error: Please provide a format style.";
+    if(!text) return "Error: Please provide text to format.";
+
+    const prompt = "Format the following text in the style of " + formatStyle + " and return the output only";
+
+    return AI_CALL(prompt, text);
+
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}

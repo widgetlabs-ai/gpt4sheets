@@ -374,3 +374,152 @@ function file_to_cell(txtID){
     SpreadsheetApp.getUi().alert("Error importing text file: " + error.toString());
   }
 }
+
+/**
+ * 
+ * @param {string} cell 
+ * @param {string} promptString 
+ * @returns {string} 
+ * 
+ * @customfunction 
+ * 
+ * @example =AI_EXTRACT(A1, "Extract the main idea")
+ */
+function AI_EXTRACT(cell, promptString){
+  try{
+    if(!cell) return "Error: Please pick a non-null cell.";
+    if(!promptString) return "Error: Please provide a prompt string.";
+
+    const prompt = "Prompt: " + promptString + "\nPlease return the answer only in the minimal words.";
+
+    return AI_CALL(prompt, cell);
+  } catch (error){
+    return "Error: " + error.message;
+  }
+}
+
+
+/**
+ * AI Classifer Function that accepts any combination of string or cells as the input
+ *
+ * @param {string/2D Array} classifiers
+ * @param {string} object
+ * @returns {string}
+ *
+ * @customfunction
+ * 
+ * @example 
+ * =AI_CLASSIFY(A1:A3, B1)
+ * =AI_CLASSIFY("Is this a fruit, vegetable, or neither?", "Rock")
+ */
+function AI_CLASSIFY(classifiers, object){
+  try {
+    if(!object) return "Error: Please provide an object to classify.";
+    if(!classifiers) return "Error: Please provide classifiers."; 
+
+    const base_prompt = "Classify the following object using these criteria: ";
+
+    if(typeof(classifiers) === "string"){
+      const prompt = base_prompt + classifiers + "Output is strictly one of the classes";
+      return AI_CALL(prompt, object);
+    } else {
+      //classifiers is a 2D array that needs to be turned to a string
+      const flattened = classifiers.flat().join(',');
+      const prompt = base_prompt + flattened + "Output is strictly one of the classes";
+      return AI_CALL(prompt, object);
+    }
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+/**
+ * 
+ * Accepts any combination of string or cells as the input
+ * 
+ * @param {cell} text 
+ * @param {user string} outputLanguage 
+ * 
+ * @customfunction
+ * 
+ * @example
+ * =AI_TRANSLATE(A1, "Spanish")
+ * =AI_TRANSLATE("Hello, world!", "French")
+ * 
+ */
+
+function AI_TRANSLATE(text, outputLanguage){
+  try{
+    if(!text) return "Error: Please provide text to translate.";
+    if(!outputLanguage) return "Error: Please provide an output language.";
+
+    const prompt = "Translate the follwing text into " + outputLanguage + ". Return the text only";
+    return AI_CALL(prompt, text);
+
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
+
+
+/**
+ * 
+ * AI Summarization with custom output length as # of sentences
+ * Works on any combination of strings or cells as input
+ * 
+ * Default sentence size is medium
+ * 
+ * @param {string} text 
+ * @param {int} num_sentences 
+ * @param {string} sentence_length 
+ * 
+ * @customfunction
+ * 
+ * @example
+ * =AI_SUMMARIZE(A1, 3, "short")
+ *
+ * 
+ */
+function AI_SUMMARIZE(text, num_sentences, sentence_length){
+  try{
+    if(!text) return "Error: Please provide text to summarize.";
+    if(!num_sentences || num_sentences <= 0) return "Error: Please provide a valid output length.";
+    if(!sentence_length) sentence_length = "medium";
+
+    const prompt = "Summarize the following text in " + num_sentences + " " + sentence_length + " sentences. Return only the summary.";
+    return AI_CALL(prompt, text);
+  } catch (error){
+    return "Error: " + error.message;
+  }
+}
+
+
+
+/**
+ * AI Formatting Function that takes in both cells and strings as inputs
+ * 
+ * 
+ * @param {string} formatStyle 
+ * @param {string} text
+ * 
+ * 
+ * @customfunction
+ * 
+ * @example
+ * =AI_FORMAT("MM/DD/YYYY", A1)
+ * =AI_FORMAT("snake case", "Hello World!")
+ *  
+ */
+function AI_FORMAT(formatStyle, text){
+  try {
+    if(!formatStyle) return "Error: Please provide a format style.";
+    if(!text) return "Error: Please provide text to format.";
+
+    const prompt = "Format the following text in the style of " + formatStyle + " and return the output only";
+
+    return AI_CALL(prompt, text);
+
+  } catch (error) {
+    return "Error: " + error.message;
+  }
+}
